@@ -1,0 +1,16 @@
+PODS:
+  - AvoidCrash (2.5.2)
+
+DEPENDENCIES:
+  - AvoidCrash (~> 2.5.2)
+
+SPEC REPOS:
+  trunk:
+    - AvoidCrash
+
+SPEC CHECKSUMS:
+  AvoidCrash: 28c6916fe19bd2b84126b8dec7cbe61c9a12741d
+
+PODFILE CHECKSUM: 71d72f8d47475688d3aa76005cdce262cab38e5e
+
+COCOAPODS: 1.8.4

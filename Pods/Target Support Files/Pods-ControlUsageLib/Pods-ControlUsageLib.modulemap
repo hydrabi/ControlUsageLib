@@ -1,0 +1,6 @@
+framework module Pods_ControlUsageLib {
+  umbrella header "Pods-ControlUsageLib-umbrella.h"
+
+  export *
+  module * { export * }
+}
