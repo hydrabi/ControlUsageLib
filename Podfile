@@ -7,4 +7,25 @@ target 'ControlUsageLib' do
 
   # Pods for ControlUsageLib
   pod 'AvoidCrash', '~> 2.5.2'
+  #响应式函数框架
+  pod 'RxSwift', '~>5.1.0'
+  pod 'RxCocoa', '~>5.1.0'
+  #约束
+  pod 'SnapKit'
+  #rxswift的数据源
+  pod 'RxDataSources'
+end
+
+deployment_target = '13.0'
+post_install do |installer|
+    installer.generated_projects.each do |project|
+        project.targets.each do |target|
+            target.build_configurations.each do |config|
+                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = deployment_target
+            end
+        end
+        project.build_configurations.each do |config|
+            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = deployment_target
+        end
+    end
 end
