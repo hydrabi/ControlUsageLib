@@ -26,9 +26,7 @@ class RxSwiftUsage:NSObject {
     }
     
     /// 测试rxswift sentMessage方法的调用方法
-    @objc dynamic func testMethod() {
-        
-    }
+    @objc dynamic func testMethod() {}
     
     func sentMessageSample() {
         //sentMessage 会在调用方法前发送值。
