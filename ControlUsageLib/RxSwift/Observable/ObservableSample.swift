@@ -10,6 +10,11 @@ import RxSwift
 import RxCocoa
 class ObservableSample {
     
+    let disposeBag = DisposeBag()
+    
+    let timer = Observable<Int>.interval(RxTimeInterval.seconds(1),
+                                         scheduler: MainScheduler.instance)
+    
     //PublishSubject 将对观察者发送订阅后产生的元素，而在订阅前发出的元素将不会发送给观察者。
 //    1,next(A)
 //    1,next(B)
@@ -86,5 +91,24 @@ class ObservableSample {
 
         subject.onNext("🅰️")
         subject.onNext("🅱️")
+    }
+    
+    /// 倒计时
+    func countdownSample() {
+        //interval：每隔一段时间，发出一个索引数，将发出无数个
+        //timer：在一段延时后，每隔一段时间产生一个元素
+//        let timer = Observable<Int>.interval(RxTimeInterval.seconds(1),
+//                                             scheduler: MainScheduler.instance)
+        //倒计时60s
+        let countDownSeconds:Int = 60
+        //用于随时停止倒计时的subject
+        let countDownStopped = BehaviorSubject(value: false)
+        //剩余时间信号
+        let leftTime = BehaviorSubject(value: countDownSeconds)
+        
+        timer.subscribe(onNext:{
+                [weak self] event in guard let strongSelf = self else { return }
+                print(event)
+            }).disposed(by: disposeBag)
     }
 }
