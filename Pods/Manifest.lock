@@ -12,6 +12,7 @@ PODS:
     - RxSwift (~> 5)
   - RxSwift (5.1.2)
   - SnapKit (5.7.1)
+  - SWXMLHash (7.0.2)
 
 DEPENDENCIES:
   - AvoidCrash (~> 2.5.2)
@@ -19,6 +20,7 @@ DEPENDENCIES:
   - RxDataSources
   - RxSwift (~> 5.1.0)
   - SnapKit
+  - SWXMLHash (~> 7.0.0)
 
 SPEC REPOS:
   trunk:
@@ -29,6 +31,7 @@ SPEC REPOS:
     - RxRelay
     - RxSwift
     - SnapKit
+    - SWXMLHash
 
 SPEC CHECKSUMS:
   AvoidCrash: 28c6916fe19bd2b84126b8dec7cbe61c9a12741d
@@ -38,7 +41,8 @@ SPEC CHECKSUMS:
   RxRelay: d77f7d771495f43c556cbc43eebd1bb54d01e8e9
   RxSwift: 1e2e1f9570186967f617e49128ed26ccf1bafc8e
   SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
+  SWXMLHash: dd733a457e9c4fe93b1538654057aefae4acb382
 
-PODFILE CHECKSUM: 99f134f5d8b737cc44de5eb537f019e11f306c12
+PODFILE CHECKSUM: d908a30cb1bb8fbc9c377eeec5677928288c4f91
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.15.0

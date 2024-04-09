@@ -14,6 +14,8 @@ target 'ControlUsageLib' do
   pod 'SnapKit'
   #rxswift的数据源
   pod 'RxDataSources'
+  #XML解析
+  pod 'SWXMLHash', '~> 7.0.0'
 end
 
 deployment_target = '13.0'
