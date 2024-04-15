@@ -13,6 +13,9 @@
 		026E4D892B2E99BF00A0858D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 026E4D872B2E99BF00A0858D /* Main.storyboard */; };
 		026E4D8B2B2E99C100A0858D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 026E4D8A2B2E99C100A0858D /* Assets.xcassets */; };
 		026E4D8E2B2E99C100A0858D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 026E4D8C2B2E99C100A0858D /* LaunchScreen.storyboard */; };
+		02747ECD2BC790AF00D74A35 /* WCDBUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02747ECC2BC790AF00D74A35 /* WCDBUsage.swift */; };
+		02747ED02BC7929100D74A35 /* HandyJsonUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02747ECF2BC7929100D74A35 /* HandyJsonUsage.swift */; };
+		02747ED32BC7E66A00D74A35 /* XMLImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02747ED22BC7E66A00D74A35 /* XMLImportViewController.swift */; };
 		029CF7082B39B76800153685 /* UILable+AttributeText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029CF7072B39B76800153685 /* UILable+AttributeText.swift */; };
 		029CF70B2B39BEA600153685 /* GenericsSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029CF70A2B39BEA600153685 /* GenericsSample.swift */; };
 		029CF70E2B39C2BB00153685 /* CollectionSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029CF70D2B39C2BB00153685 /* CollectionSample.swift */; };
@@ -35,6 +38,9 @@
 		026E4D8A2B2E99C100A0858D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		026E4D8D2B2E99C100A0858D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		026E4D8F2B2E99C100A0858D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		02747ECC2BC790AF00D74A35 /* WCDBUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WCDBUsage.swift; sourceTree = "<group>"; };
+		02747ECF2BC7929100D74A35 /* HandyJsonUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandyJsonUsage.swift; sourceTree = "<group>"; };
+		02747ED22BC7E66A00D74A35 /* XMLImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMLImportViewController.swift; sourceTree = "<group>"; };
 		029CF7072B39B76800153685 /* UILable+AttributeText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILable+AttributeText.swift"; sourceTree = "<group>"; };
 		029CF70A2B39BEA600153685 /* GenericsSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericsSample.swift; sourceTree = "<group>"; };
 		029CF70D2B39C2BB00153685 /* CollectionSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionSample.swift; sourceTree = "<group>"; };
@@ -85,9 +91,8 @@
 		026E4D802B2E99BF00A0858D /* ControlUsageLib */ = {
 			isa = PBXGroup;
 			children = (
-				02BE7F572BC56C0700013433 /* XMLPrase */,
+				02747ECA2BC7906400D74A35 /* ThirdParty */,
 				02BE7F542BC56BE100013433 /* Resource */,
-				02CCD8762B899303002A442E /* RxSwift */,
 				029CF70C2B39C2A900153685 /* Collection */,
 				029CF7092B39BE7A00153685 /* Generics */,
 				026E4D952B2E9BFD00A0858D /* UIControl */,
@@ -122,6 +127,41 @@
 			path = UILabel;
 			sourceTree = "<group>";
 		};
+		02747ECA2BC7906400D74A35 /* ThirdParty */ = {
+			isa = PBXGroup;
+			children = (
+				02747ECE2BC791DD00D74A35 /* HandyJson */,
+				02747ECB2BC7907A00D74A35 /* WCDB */,
+				02CCD8762B899303002A442E /* RxSwift */,
+				02BE7F572BC56C0700013433 /* SWXMLHash */,
+			);
+			path = ThirdParty;
+			sourceTree = "<group>";
+		};
+		02747ECB2BC7907A00D74A35 /* WCDB */ = {
+			isa = PBXGroup;
+			children = (
+				02747ECC2BC790AF00D74A35 /* WCDBUsage.swift */,
+			);
+			path = WCDB;
+			sourceTree = "<group>";
+		};
+		02747ECE2BC791DD00D74A35 /* HandyJson */ = {
+			isa = PBXGroup;
+			children = (
+				02747ECF2BC7929100D74A35 /* HandyJsonUsage.swift */,
+			);
+			path = HandyJson;
+			sourceTree = "<group>";
+		};
+		02747ED12BC7E62A00D74A35 /* XMLImportViewController */ = {
+			isa = PBXGroup;
+			children = (
+				02747ED22BC7E66A00D74A35 /* XMLImportViewController.swift */,
+			);
+			path = XMLImportViewController;
+			sourceTree = "<group>";
+		};
 		029CF7092B39BE7A00153685 /* Generics */ = {
 			isa = PBXGroup;
 			children = (
@@ -146,12 +186,13 @@
 			path = Resource;
 			sourceTree = "<group>";
 		};
-		02BE7F572BC56C0700013433 /* XMLPrase */ = {
+		02BE7F572BC56C0700013433 /* SWXMLHash */ = {
 			isa = PBXGroup;
 			children = (
+				02747ED12BC7E62A00D74A35 /* XMLImportViewController */,
 				02BE7F582BC56C2F00013433 /* SWXMLHashUsage */,
 			);
-			path = XMLPrase;
+			path = SWXMLHash;
 			sourceTree = "<group>";
 		};
 		02BE7F582BC56C2F00013433 /* SWXMLHashUsage */ = {
@@ -346,12 +387,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02747ED02BC7929100D74A35 /* HandyJsonUsage.swift in Sources */,
 				02EF34692B944BC000E1D84B /* UITableViewCell+RxSwift.swift in Sources */,
 				029CF7082B39B76800153685 /* UILable+AttributeText.swift in Sources */,
+				02747ED32BC7E66A00D74A35 /* XMLImportViewController.swift in Sources */,
 				02CCD8792B899799002A442E /* ObservableSample.swift in Sources */,
 				02BE7F5A2BC56C6000013433 /* SWXMLHashUsage.swift in Sources */,
 				029CF70B2B39BEA600153685 /* GenericsSample.swift in Sources */,
 				026E4D862B2E99BF00A0858D /* ViewController.swift in Sources */,
+				02747ECD2BC790AF00D74A35 /* WCDBUsage.swift in Sources */,
 				029CF70E2B39C2BB00153685 /* CollectionSample.swift in Sources */,
 				02D395C32B4A4EDC006EBA8C /* String+Operation.swift in Sources */,
 				026E4D822B2E99BF00A0858D /* AppDelegate.swift in Sources */,
@@ -511,6 +555,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KYM5XD9M7S;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ControlUsageLib/Info.plist;
@@ -544,6 +589,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KYM5XD9M7S;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ControlUsageLib/Info.plist;
