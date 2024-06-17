@@ -8,6 +8,11 @@
 import Foundation
 import RxSwift
 import RxCocoa
+
+class Person {
+    var name = "1"
+}
+
 class ObservableSample {
     
     let disposeBag = DisposeBag()
@@ -110,5 +115,6 @@ class ObservableSample {
                 [weak self] event in guard let strongSelf = self else { return }
                 print(event)
             }).disposed(by: disposeBag)
+
     }
 }

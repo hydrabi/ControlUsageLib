@@ -43,23 +43,26 @@ class XMLImportViewController: UIViewController {
             [weak self] _ in guard let strongSelf = self else { return }
             strongSelf.openDocumentPicker()
         }).disposed(by: disposeBag)
+        
+        
+        
     }
     
     // 通过UIDocumentPickerViewController获取设备内存或者iCould中的资源
     func openDocumentPicker() {
         let document:UIDocumentPickerViewController
         if #available(iOS 14, *) {
-            let supportedTypes:[UTType] = [UTType.xml,UTType.init(importedAs: "com.example.gdtf")]
+            let supportedTypes:[UTType] = [UTType.xml,UTType.init(importedAs: K_GDTF_UTTYPE_DES)]
             document = UIDocumentPickerViewController(forOpeningContentTypes: supportedTypes)
         }
         else{
             let supportedTypes:[String] = [kUTTypeXML as String,
-                                           "com.example.gdtf"]
+                                           K_GDTF_UTTYPE_DES]
             document = UIDocumentPickerViewController(documentTypes: supportedTypes, in: .import)
         }
         
         document.delegate = self
-        document.allowsMultipleSelection = false
+        document.allowsMultipleSelection = true
         document.modalPresentationStyle = .automatic
         present(document, animated: true)
     }
@@ -84,7 +87,6 @@ extension XMLImportViewController:UIDocumentPickerDelegate {
             else if url.lastPathComponent.hasSuffix(".xml"){
                 parseXMLFile(url: url)
             }
-            
         }
     }
     
@@ -96,6 +98,9 @@ extension XMLImportViewController:UIDocumentPickerDelegate {
                                 appropriateFor: nil,
                                 create: false).appendingPathComponent("GDTF")
         else { return }
+        //先清空目录中的所有内容
+        try? FileManager.default.removeItem(at: destPath)
+        
         //创建GDTF临时操作目录
         try? FileManager.default.createDirectory(atPath: destPath.path, withIntermediateDirectories: true)
         //临时存储的gdtf路径，方便之后解压
@@ -129,8 +134,9 @@ extension XMLImportViewController:UIDocumentPickerDelegate {
     func parseXMLFile(url:URL) {
         if let data = try? Data(contentsOf: url) {
             if let xmlStr = String(data: data, encoding: .utf8) {
-                if let fixtureType = SWXMLHashUsage().analizeGDTF(xmlStr: xmlStr) {
-                    print(fixtureType)
+                if let fixtureType = SWXMLHashUsage().analizeGDTF(xmlStr: xmlStr) {                    
+                    let model = fixtureType.transfromFixtureModel()
+                    print(model)
                 }
             }
         }

@@ -3,29 +3,16 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "static DMXChanel.deserialize(_:):SWXMLHashUsage.swift">
+         contextName = "FixtureType.transformSingleChannelModel(tempDMXChannel:):FixtureType+Transform.swift">
       </ContextState>
       <ContextState
-         contextName = "ContextDescriptorType.fieldOffsets.getter:ContextDescriptorType.swift">
+         contextName = "SegmentMenu.scrollViewDidScroll(_:):ViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "contextDescriptor.numberOfFields">
+               value = "scrollView.contentOffset">
             </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "__38-[MutableThreadTest mutableThreadTest]_block_invoke:MutableThreadTest.m">
-         <PersistentStrings>
             <PersistentString
-               value = "[self.testArray mutableCopy]">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "ContextDescriptorType.contextDescriptor.getter:ContextDescriptorType.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "contextDescriptorOffsetLocation">
+               value = "scrollView.contentOffset.x - scrollView.bounds.width">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -47,6 +34,50 @@
          contextName = "SWXMLHashUsage.parseXML():SWXMLHashUsage.swift">
       </ContextState>
       <ContextState
+         contextName = "SegmentMenu.shouldAddGradientLayer():ViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "scrollView.frame.width">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "static FixtureType.deserialize(_:):SWXMLHashUsage.swift">
+      </ContextState>
+      <ContextState
+         contextName = "ContextDescriptorType.contextDescriptor.getter:ContextDescriptorType.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "contextDescriptorOffsetLocation">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "static DMXChanel.deserialize(_:):SWXMLHashUsage.swift">
+      </ContextState>
+      <ContextState
+         contextName = "static ChannelFunction.deserialize(_:):SWXMLHashUsage.swift">
+      </ContextState>
+      <ContextState
+         contextName = "FixtureType.transfromChannelModel(tempDMXMode:):FixtureType+Transform.swift">
+      </ContextState>
+      <ContextState
+         contextName = "MetadataType.kind.getter:Metadata.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "UnsafePointer&lt;Int&gt;(pointer)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "__38-[MutableThreadTest mutableThreadTest]_block_invoke:MutableThreadTest.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "[self.testArray mutableCopy]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "+[FLEXUtility appKeyWindow]:FLEXUtility.m">
          <PersistentStrings>
             <PersistentString
@@ -66,16 +97,21 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "static FixtureType.deserialize(_:):SWXMLHashUsage.swift">
+         contextName = "FixtureType.mapChannelRelativeAndAbsolute(tempLogicalChannel:isFine:channelName:minValue:maxValue:):FixtureType+RelativeAndAbsolute.swift">
       </ContextState>
       <ContextState
-         contextName = "static ChannelFunction.deserialize(_:):SWXMLHashUsage.swift">
-      </ContextState>
-      <ContextState
-         contextName = "MetadataType.kind.getter:Metadata.swift">
+         contextName = "FixtureType.transfomrPatternModel():FixtureType+Transform.swift">
          <PersistentStrings>
             <PersistentString
-               value = "UnsafePointer&lt;Int&gt;(pointer)">
+               value = "patternModel.modeChannel">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ContextDescriptorType.fieldOffsets.getter:ContextDescriptorType.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "contextDescriptor.numberOfFields">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

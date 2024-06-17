@@ -13,8 +13,6 @@ final class Sample: TableCodable {
     var identifier: Int? = nil
     var description: String? = nil
     
-    
-    
     enum CodingKeys: String, CodingTableKey {
         typealias Root = Sample
         static let objectRelationalMapping = TableBinding(CodingKeys.self) {
@@ -29,7 +27,11 @@ final class Sample: TableCodable {
 class WCDBTestObject {
     
     lazy var database:Database = {
-        let database = Database(at: "~/Test/sample.db")
+        let path = try? FileManager.default.url(for: .documentDirectory,
+                                                in: .userDomainMask,
+                                                appropriateFor: nil,
+                                                create: true).appendingPathComponent("/DataBase/sample.db")
+        let database = Database(at: path!)
         //等效于创建数据库语句
         try? database.create(table: "sampleTable", of: Sample.self)
         return database
@@ -42,8 +44,25 @@ class WCDBTestObject {
         let object = Sample()
         object.identifier = 1
         object.description = "sample_insert"
-        try? database.insert(object, intoTable: "sampleTable")
+        do {
+            //成功
+            try database.insert(object, intoTable: "sampleTable")
+        }
+        catch (let error) {
+            print(error.localizedDescription)
+        }
         
+        do {
+            //失败 因为主键 identifier = 1 已经存在
+            try database.insert(object, intoTable: "sampleTable")
+        }
+        catch (let error) {
+            print(error)
+        }
+
         let objects:[Sample] = try! database.getObjects(fromTable: "sampleTable")
+        
     }
+    
+   
 }

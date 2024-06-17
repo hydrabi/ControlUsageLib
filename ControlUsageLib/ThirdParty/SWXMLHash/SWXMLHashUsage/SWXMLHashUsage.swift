@@ -8,6 +8,37 @@
 import Foundation
 import SWXMLHash
 
+let K_CHANNEL_INT = "INT" // INT通道
+let K_CHANNEL_CCT = "CCT" // CCT通道
+let K_CHANNEL_CCT_16bit = "CCT 16bit" // CCT 16bit通道
+let K_CHANNEL_GM = "G/M" // GM通道
+let K_CHANNEL_R = "R" // Red通道
+let K_CHANNEL_G = "G" // Green通道
+let K_CHANNEL_B = "B" // Blue通道
+let K_CHANNEL_Amber = "Amber" // Amber通道
+let K_CHANNEL_Cyan = "Cyan" // Cyan通道
+let K_CHANNEL_Lime = "Lime" // Lime通道
+let K_CHANNEL_HUE = "HUE" // HUE通道
+let K_CHANNEL_SAT = "SAT" // SAT通道
+let K_CHANNEL_W = "W" // White 通道
+let K_CHANNEL_CW = "CW" // Cool White 通道
+let K_CHANNEL_WW = "WW" // Warm White 通道
+let K_CHANNEL_X = "X" // X通道
+let K_CHANNEL_Y = "Y" // Y通道
+let K_CHANNEL_Other = "Constant" // Other 通道
+let K_CHANNEL_FADE = "Crossfade" // fade通道
+
+let K_CHANNEL_PAN = "Pan" //FINEART 水平轴侧向运动
+let K_CHANNEL_TILT = "Tilt" //FINEART 垂直轴侧向运动
+let K_CHANNEL_ZOOM = "Zoom" //控制灯具光束/光斑的扩散
+let K_CHANNEL_FOCUS = "Focus" //控制灯具的聚光灯的清晰度。可以模糊或锐化斑点的边缘。
+
+let K_MANUFACTURER_Arri = "ARRI"    //Arri GDTF 厂家名称
+let K_MANUFACTURER_Astera_LED_Technology = "Astera_LED_Technology" //Astera GDTF 厂家名称
+let K_MANUFACTURER_Creamsource = "Creamsource" //Creamsource GDTF 厂家名称
+let K_MANUFACTURER_Fiilex = "Fiilex"    //Fiilex GDTF 厂家名称
+let K_GDTF_UTTYPE_DES = "com.example.gdtf"
+
 /// LogicalChannel 中Snap的枚举属性
 enum DMXSnapType:Int {
     case Yes,No,On,Off
@@ -16,6 +47,61 @@ enum DMXSnapType:Int {
 /// 定义所有从属通道功能是否对控制系统定义的组控制做出反应。 值：“无”、“大”、“组”； 默认值：“无”。
 enum DMXMasterType {
     case None,Grand,Group
+}
+
+/// 遍历LogicalChannel下所有ChannelFunction节点提取的可用属性
+struct DMXChannelAvailable {
+    let DMXFrom:String
+    let Name:String
+    /// 物理起始值； 默认值：0
+    let PhysicalFrom:String
+    /// 物理终值； 默认值：1
+    let PhysicalTo:String
+}
+
+class AUFixtureModel {
+    var facturerName:String = ""            //制造商名称
+    var model:String = ""                   //型号名称
+    
+    @objc var deviceName:String = ""              //设备名称
+    @objc var defaultName:String = ""             //默认设备名称
+    var ESTAMANID:String = ""               //ESTA制造商UID
+    var ESTADEVICEID:String = ""            //ESTA型号UID
+    @objc var supSQNet:String = ""                //1支持 0不支持
+    @objc var supRDM:String = ""                  //1支持 0不支持
+    @objc var supDMX:String = ""                  //1支持 0不支持
+    
+    @objc var supArtNet:String = ""               //1支持 0不支持
+    @objc var supSACN:String = ""                 //1支持 0不支持
+    @objc var supRDMnet:String = ""               //1支持 0不支持
+    
+    @objc var modeAry = [Any]()                   //设备模式数组
+}
+
+class AUPatternModel {
+    @objc var modeID:String = ""                 //模式ID
+    @objc var modeName:String = ""               //模式名称
+    @objc var mutiMode:String = ""               //多模式切换
+    @objc var supportChange:String = "0"         //是否支持切换 1支持 0不支持
+    @objc var supChannelNum:String = ""          //支持切换的通道地址
+    @objc var specialMode:String = ""            //特殊模式 HSIC、RGBC
+    /// -1、无任何 0、单色温  1、双色温  2、简彩  3、全彩  4、bridge
+    @objc var functionType:Int = 3
+    @objc var modeChannel = [Any]()              //通道数组
+}
+
+class AUChannelModel {
+    
+    @objc var channelName:String = ""             //通道名称
+    @objc var channelNum:String = ""              //通道号(地址)
+    @objc var minValue:String = "0"               //最小值
+    @objc var maxValue:String = "255"             //最大值
+    @objc var channelPer:String = ""              //单位
+    
+    @objc var relative:String = ""                //相对值范围 按逗号分隔
+    @objc var absolute:String = ""                //绝对值范围 按逗号分隔
+    @objc var isFine:String = "0"                 //fine模式
+    @objc var channelID:String = ""               //本地通道ID
 }
 
 /// FixtureType 节点是 XML 文件中灯具类型描述的起点。
@@ -36,8 +122,16 @@ struct FixtureType:XMLObjectDeserialization {
     ///  灯具类型的唯一编号 (GUID)
     let FixtureTypeID:String
     
-    let Protocols:[FTRDM]
+    /// RDM相关信息
+    let FTRDMs:[FTRDM]
     
+    /// ArtNet相关信息
+    let GDTFArtNets:[GDTFArtNet]
+    
+    /// sACN相关信息
+    let GDTFsACNs:[GDTFsACN]
+    
+    /// DMX模式集合
     let DMXModes:[DMXMode]
     
     static func deserialize(_ element: XMLIndexer) throws -> FixtureType {
@@ -48,11 +142,27 @@ struct FixtureType:XMLObjectDeserialization {
         let ShortName = element.element?.attribute(by: "ShortName")?.text ?? ""
         let FixtureTypeID = element.element?.attribute(by: "FixtureTypeID")?.text ?? ""
         
-        //解析Protocols
-        var tempProtocols = [FTRDM]()
+        //解析RDM
+        var tempRDMs = [FTRDM]()
         for FTRDMXMLIndexer in element["Protocols"]["FTRDM"].all {
             if let tempFTRDM = try? FTRDM.deserialize(FTRDMXMLIndexer) {
-                tempProtocols.append(tempFTRDM)
+                tempRDMs.append(tempFTRDM)
+            }
+        }
+        
+        //解析ArtNet
+        var tempArtNets = [GDTFArtNet]()
+        for ArtNetXMLIndexer in element["Protocols"]["Art-Net"].all {
+            if let tempArtNet = try? GDTFArtNet.deserialize(ArtNetXMLIndexer) {
+                tempArtNets.append(tempArtNet)
+            }
+        }
+        
+        //解析sACN
+        var tempsACNs = [GDTFsACN]()
+        for sACNXMLIndexer in element["Protocols"]["sACN"].all {
+            if let tempsACN = try? GDTFsACN.deserialize(sACNXMLIndexer) {
+                tempsACNs.append(tempsACN)
             }
         }
         
@@ -69,11 +179,14 @@ struct FixtureType:XMLObjectDeserialization {
                            LongName: LongName,
                            ShortName: ShortName,
                            FixtureTypeID: FixtureTypeID,
-                           Protocols: tempProtocols, DMXModes: tempDMXModes)
+                           FTRDMs: tempRDMs,
+                           GDTFArtNets: tempArtNets,
+                           GDTFsACNs: tempsACNs,
+                           DMXModes: tempDMXModes)
     }
 }
 
-/// 用于指定支持的协议。
+/// RDM 相关的信息
 struct FTRDM:XMLObjectDeserialization {
     
     /// 该灯具制造商的唯一 ID
@@ -88,6 +201,53 @@ struct FTRDM:XMLObjectDeserialization {
         let DeviceModelID = element.element?.attribute(by: "DeviceModelID")?.text ?? ""
         
         return FTRDM(ManufacturerID: ManufacturerID, DeviceModelID: DeviceModelID)
+    }
+}
+
+struct GDTFMap:XMLObjectDeserialization {
+    /// Artnet 值
+    let Key:String
+    /// DMX 值
+    let Value:String
+    
+    static func deserialize(_ element: XMLIndexer) throws -> GDTFMap {
+        //解析属性
+        let Key = element.element?.attribute(by: "Key")?.text ?? ""
+        let Value = element.element?.attribute(by: "Key")?.text ?? ""
+        return GDTFMap(Key: Key, Value: Value)
+    }
+}
+
+/// Art-Net 相关的信息
+struct GDTFArtNet:XMLObjectDeserialization {
+
+    let Maps:[GDTFMap]
+    
+    static func deserialize(_ element: XMLIndexer) throws -> GDTFArtNet {
+        //解析包含的所有DMXChannels元素
+        var tempMaps:[GDTFMap] = []
+        for DMXMapXMLIndexer in element["Maps"]["Map"].all {
+            if let tempGDTFMap = try? GDTFMap.deserialize(DMXMapXMLIndexer) {
+                tempMaps.append(tempGDTFMap)
+            }
+        }
+        return GDTFArtNet(Maps: tempMaps)
+    }
+}
+
+/// sACN相关信息
+struct GDTFsACN:XMLObjectDeserialization {
+    let Maps:[GDTFMap]
+    
+    static func deserialize(_ element: XMLIndexer) throws -> GDTFsACN {
+        //解析包含的所有DMXChannels元素
+        var tempMaps:[GDTFMap] = []
+        for DMXMapXMLIndexer in element["Maps"]["Map"].all {
+            if let tempGDTFMap = try? GDTFMap.deserialize(DMXMapXMLIndexer) {
+                tempMaps.append(tempGDTFMap)
+            }
+        }
+        return GDTFsACN(Maps: tempMaps)
     }
 }
 
@@ -349,8 +509,6 @@ class SWXMLHashUsage {
             print("fail")
         }
     }
-    
-
     
     /// 解析GDTF xml文件
     /// - Parameter xmlStr: xml字符串

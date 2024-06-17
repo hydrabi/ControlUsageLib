@@ -19,8 +19,13 @@
 		029CF7082B39B76800153685 /* UILable+AttributeText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029CF7072B39B76800153685 /* UILable+AttributeText.swift */; };
 		029CF70B2B39BEA600153685 /* GenericsSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029CF70A2B39BEA600153685 /* GenericsSample.swift */; };
 		029CF70E2B39C2BB00153685 /* CollectionSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029CF70D2B39C2BB00153685 /* CollectionSample.swift */; };
+		02B9B3522BD67DFB006FBFDC /* PromiseLearn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02B9B3512BD67DFB006FBFDC /* PromiseLearn.swift */; };
 		02BE7F562BC56BF400013433 /* description.xml in Resources */ = {isa = PBXBuildFile; fileRef = 02BE7F552BC56BF400013433 /* description.xml */; };
 		02BE7F5A2BC56C6000013433 /* SWXMLHashUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02BE7F592BC56C6000013433 /* SWXMLHashUsage.swift */; };
+		02CBB2482BD0C4B90004EFDC /* FixtureType+RelativeAndAbsolute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02CBB2472BD0C4B90004EFDC /* FixtureType+RelativeAndAbsolute.swift */; };
+		02CBB24A2BD0C9550004EFDC /* FixtureType+Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02CBB2492BD0C9550004EFDC /* FixtureType+Common.swift */; };
+		02CBB24C2BD120830004EFDC /* FixtureType+Transform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02CBB24B2BD120830004EFDC /* FixtureType+Transform.swift */; };
+		02CC443C2BDF733800C500CE /* CodeiumTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02CC443B2BDF733800C500CE /* CodeiumTest.swift */; };
 		02CCD8792B899799002A442E /* ObservableSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02CCD8782B899799002A442E /* ObservableSample.swift */; };
 		02CF42CE2B48FB7000F5532C /* AvoidcrashTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 02CF42CD2B48FB7000F5532C /* AvoidcrashTest.m */; };
 		02D395C32B4A4EDC006EBA8C /* String+Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D395C22B4A4EDC006EBA8C /* String+Operation.swift */; };
@@ -44,8 +49,13 @@
 		029CF7072B39B76800153685 /* UILable+AttributeText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILable+AttributeText.swift"; sourceTree = "<group>"; };
 		029CF70A2B39BEA600153685 /* GenericsSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericsSample.swift; sourceTree = "<group>"; };
 		029CF70D2B39C2BB00153685 /* CollectionSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionSample.swift; sourceTree = "<group>"; };
+		02B9B3512BD67DFB006FBFDC /* PromiseLearn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseLearn.swift; sourceTree = "<group>"; };
 		02BE7F552BC56BF400013433 /* description.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = description.xml; sourceTree = "<group>"; };
 		02BE7F592BC56C6000013433 /* SWXMLHashUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SWXMLHashUsage.swift; sourceTree = "<group>"; };
+		02CBB2472BD0C4B90004EFDC /* FixtureType+RelativeAndAbsolute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FixtureType+RelativeAndAbsolute.swift"; sourceTree = "<group>"; };
+		02CBB2492BD0C9550004EFDC /* FixtureType+Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FixtureType+Common.swift"; sourceTree = "<group>"; };
+		02CBB24B2BD120830004EFDC /* FixtureType+Transform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FixtureType+Transform.swift"; sourceTree = "<group>"; };
+		02CC443B2BDF733800C500CE /* CodeiumTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeiumTest.swift; sourceTree = "<group>"; };
 		02CCD8782B899799002A442E /* ObservableSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableSample.swift; sourceTree = "<group>"; };
 		02CF42CB2B48FB6F00F5532C /* ControlUsageLib-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ControlUsageLib-Bridging-Header.h"; sourceTree = "<group>"; };
 		02CF42CC2B48FB7000F5532C /* AvoidcrashTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AvoidcrashTest.h; sourceTree = "<group>"; };
@@ -130,6 +140,8 @@
 		02747ECA2BC7906400D74A35 /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				02CC443A2BDF731F00C500CE /* Codeium */,
+				02B9B3502BD67DE9006FBFDC /* Promise */,
 				02747ECE2BC791DD00D74A35 /* HandyJson */,
 				02747ECB2BC7907A00D74A35 /* WCDB */,
 				02CCD8762B899303002A442E /* RxSwift */,
@@ -178,6 +190,14 @@
 			path = Collection;
 			sourceTree = "<group>";
 		};
+		02B9B3502BD67DE9006FBFDC /* Promise */ = {
+			isa = PBXGroup;
+			children = (
+				02B9B3512BD67DFB006FBFDC /* PromiseLearn.swift */,
+			);
+			path = Promise;
+			sourceTree = "<group>";
+		};
 		02BE7F542BC56BE100013433 /* Resource */ = {
 			isa = PBXGroup;
 			children = (
@@ -199,8 +219,19 @@
 			isa = PBXGroup;
 			children = (
 				02BE7F592BC56C6000013433 /* SWXMLHashUsage.swift */,
+				02CBB2472BD0C4B90004EFDC /* FixtureType+RelativeAndAbsolute.swift */,
+				02CBB2492BD0C9550004EFDC /* FixtureType+Common.swift */,
+				02CBB24B2BD120830004EFDC /* FixtureType+Transform.swift */,
 			);
 			path = SWXMLHashUsage;
+			sourceTree = "<group>";
+		};
+		02CC443A2BDF731F00C500CE /* Codeium */ = {
+			isa = PBXGroup;
+			children = (
+				02CC443B2BDF733800C500CE /* CodeiumTest.swift */,
+			);
+			path = Codeium;
 			sourceTree = "<group>";
 		};
 		02CCD8762B899303002A442E /* RxSwift */ = {
@@ -388,8 +419,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				02747ED02BC7929100D74A35 /* HandyJsonUsage.swift in Sources */,
+				02B9B3522BD67DFB006FBFDC /* PromiseLearn.swift in Sources */,
 				02EF34692B944BC000E1D84B /* UITableViewCell+RxSwift.swift in Sources */,
+				02CBB2482BD0C4B90004EFDC /* FixtureType+RelativeAndAbsolute.swift in Sources */,
 				029CF7082B39B76800153685 /* UILable+AttributeText.swift in Sources */,
+				02CBB24C2BD120830004EFDC /* FixtureType+Transform.swift in Sources */,
+				02CBB24A2BD0C9550004EFDC /* FixtureType+Common.swift in Sources */,
 				02747ED32BC7E66A00D74A35 /* XMLImportViewController.swift in Sources */,
 				02CCD8792B899799002A442E /* ObservableSample.swift in Sources */,
 				02BE7F5A2BC56C6000013433 /* SWXMLHashUsage.swift in Sources */,
@@ -401,6 +436,7 @@
 				026E4D822B2E99BF00A0858D /* AppDelegate.swift in Sources */,
 				02EF34652B9431C400E1D84B /* RxSwiftUsage.swift in Sources */,
 				026E4D842B2E99BF00A0858D /* SceneDelegate.swift in Sources */,
+				02CC443C2BDF733800C500CE /* CodeiumTest.swift in Sources */,
 				02CF42CE2B48FB7000F5532C /* AvoidcrashTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
