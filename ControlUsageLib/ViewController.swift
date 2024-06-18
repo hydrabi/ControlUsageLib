@@ -68,12 +68,16 @@ func RGBA(r: UInt, g: UInt, b: UInt, a: CGFloat) -> UIColor {
 
 class ViewController: UIViewController {
 
+    var combind:CombindLearn? = nil
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         
         // Do any additional setup after loading the view.
-//        WCDBTestObject().test()
+
+        combind = CombindLearn()
+        combind?.sample4()
     }
 
 

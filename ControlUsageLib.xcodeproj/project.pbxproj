@@ -29,6 +29,8 @@
 		02CCD8792B899799002A442E /* ObservableSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02CCD8782B899799002A442E /* ObservableSample.swift */; };
 		02CF42CE2B48FB7000F5532C /* AvoidcrashTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 02CF42CD2B48FB7000F5532C /* AvoidcrashTest.m */; };
 		02D395C32B4A4EDC006EBA8C /* String+Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D395C22B4A4EDC006EBA8C /* String+Operation.swift */; };
+		02E314352C21858F00000B8E /* CombindLearn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E314342C21858F00000B8E /* CombindLearn.swift */; };
+		02E314382C218E9000000B8E /* WhereSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E314372C218E9000000B8E /* WhereSample.swift */; };
 		02EF34652B9431C400E1D84B /* RxSwiftUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02EF34642B9431C400E1D84B /* RxSwiftUsage.swift */; };
 		02EF34692B944BC000E1D84B /* UITableViewCell+RxSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02EF34682B944BC000E1D84B /* UITableViewCell+RxSwift.swift */; };
 		0C0ABD43AE22FB2064D190DF /* Pods_ControlUsageLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 183FD35CB60D1727B7DE63BC /* Pods_ControlUsageLib.framework */; };
@@ -61,6 +63,8 @@
 		02CF42CC2B48FB7000F5532C /* AvoidcrashTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AvoidcrashTest.h; sourceTree = "<group>"; };
 		02CF42CD2B48FB7000F5532C /* AvoidcrashTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AvoidcrashTest.m; sourceTree = "<group>"; };
 		02D395C22B4A4EDC006EBA8C /* String+Operation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Operation.swift"; sourceTree = "<group>"; };
+		02E314342C21858F00000B8E /* CombindLearn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombindLearn.swift; sourceTree = "<group>"; };
+		02E314372C218E9000000B8E /* WhereSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhereSample.swift; sourceTree = "<group>"; };
 		02EF34642B9431C400E1D84B /* RxSwiftUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RxSwiftUsage.swift; sourceTree = "<group>"; };
 		02EF34682B944BC000E1D84B /* UITableViewCell+RxSwift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableViewCell+RxSwift.swift"; sourceTree = "<group>"; };
 		183FD35CB60D1727B7DE63BC /* Pods_ControlUsageLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ControlUsageLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -101,6 +105,8 @@
 		026E4D802B2E99BF00A0858D /* ControlUsageLib */ = {
 			isa = PBXGroup;
 			children = (
+				02E314362C21887800000B8E /* SwiftTask */,
+				02E314332C21858000000B8E /* Combind */,
 				02747ECA2BC7906400D74A35 /* ThirdParty */,
 				02BE7F542BC56BE100013433 /* Resource */,
 				029CF70C2B39C2A900153685 /* Collection */,
@@ -186,6 +192,7 @@
 			isa = PBXGroup;
 			children = (
 				029CF70D2B39C2BB00153685 /* CollectionSample.swift */,
+				02E314372C218E9000000B8E /* WhereSample.swift */,
 			);
 			path = Collection;
 			sourceTree = "<group>";
@@ -257,6 +264,21 @@
 				02D395C22B4A4EDC006EBA8C /* String+Operation.swift */,
 			);
 			path = String;
+			sourceTree = "<group>";
+		};
+		02E314332C21858000000B8E /* Combind */ = {
+			isa = PBXGroup;
+			children = (
+				02E314342C21858F00000B8E /* CombindLearn.swift */,
+			);
+			path = Combind;
+			sourceTree = "<group>";
+		};
+		02E314362C21887800000B8E /* SwiftTask */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = SwiftTask;
 			sourceTree = "<group>";
 		};
 		02EF34632B94314300E1D84B /* Useage */ = {
@@ -427,6 +449,7 @@
 				02CBB24A2BD0C9550004EFDC /* FixtureType+Common.swift in Sources */,
 				02747ED32BC7E66A00D74A35 /* XMLImportViewController.swift in Sources */,
 				02CCD8792B899799002A442E /* ObservableSample.swift in Sources */,
+				02E314382C218E9000000B8E /* WhereSample.swift in Sources */,
 				02BE7F5A2BC56C6000013433 /* SWXMLHashUsage.swift in Sources */,
 				029CF70B2B39BEA600153685 /* GenericsSample.swift in Sources */,
 				026E4D862B2E99BF00A0858D /* ViewController.swift in Sources */,
@@ -438,6 +461,7 @@
 				026E4D842B2E99BF00A0858D /* SceneDelegate.swift in Sources */,
 				02CC443C2BDF733800C500CE /* CodeiumTest.swift in Sources */,
 				02CF42CE2B48FB7000F5532C /* AvoidcrashTest.m in Sources */,
+				02E314352C21858F00000B8E /* CombindLearn.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
