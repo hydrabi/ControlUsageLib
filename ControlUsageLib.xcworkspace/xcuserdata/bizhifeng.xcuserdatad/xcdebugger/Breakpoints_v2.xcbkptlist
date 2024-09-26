@@ -34,38 +34,22 @@
             endingLineNumber = "96"
             landmarkName = "transfomrPatternModel()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "F34D01D8-D24C-4B98-A81B-EE22E9F9DCEB - 26a8a83b16d067db"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ControlUsageLib.FixtureType.transfomrPatternModel() -&gt; Swift.Array&lt;Any&gt;"
-                  moduleName = "ControlUsageLib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bizhifeng/Documents/code/ControlUsageLib/ControlUsageLib/ThirdParty/SWXMLHash/SWXMLHashUsage/FixtureType+Transform.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "96"
-                  endingLineNumber = "96"
-                  offsetFromSymbolStart = "2511">
-               </Location>
-               <Location
-                  uuid = "F34D01D8-D24C-4B98-A81B-EE22E9F9DCEB - 26a8a83b16d067db"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ControlUsageLib.FixtureType.transfomrPatternModel() -&gt; Swift.Array&lt;Any&gt;"
-                  moduleName = "ControlUsageLib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bizhifeng/Documents/code/ControlUsageLib/ControlUsageLib/ThirdParty/SWXMLHash/SWXMLHashUsage/FixtureType+Transform.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "96"
-                  endingLineNumber = "96"
-                  offsetFromSymbolStart = "2755">
-               </Location>
-            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "AB03CD52-4416-4B66-BE30-FFD2F704DD24"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ControlUsageLib/Combine/CombindLearn.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "112"
+            endingLineNumber = "112"
+            landmarkName = "defereedTest()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
