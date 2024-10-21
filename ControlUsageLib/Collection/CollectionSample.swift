@@ -25,8 +25,10 @@ class CollectionSample {
         //遍历
         for (key,value) in dic {
             print("key:\(key),value:\(value)")
+            
         }
     }
+    
     
 
 }

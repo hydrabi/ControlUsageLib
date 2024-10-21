@@ -7,14 +7,17 @@
 
 import UIKit
 
+import RxSwift
+import RxCocoa
+
 class ViewController: UIViewController {
+
+    let sample:ObservableSample = ObservableSample()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        // Do any additional setup after loading the view.
-        ObservableSample().countdownSample()
+
     }
 
 
