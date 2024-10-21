@@ -1,6 +1,8 @@
 PODS:
   - AvoidCrash (2.5.2)
   - Differentiator (4.0.1)
+  - FLEX (5.22.10)
+  - HandyJSON (5.0.2)
   - RxCocoa (5.1.1):
     - RxRelay (~> 5)
     - RxSwift (~> 5)
@@ -12,33 +14,56 @@ PODS:
     - RxSwift (~> 5)
   - RxSwift (5.1.2)
   - SnapKit (5.7.1)
+  - SSZipArchive (2.4.3)
+  - SWXMLHash (7.0.2)
+  - WCDB.swift (2.1.2):
+    - WCDBOptimizedSQLCipher (= 1.4.4)
+  - WCDBOptimizedSQLCipher (1.4.4)
 
 DEPENDENCIES:
   - AvoidCrash (~> 2.5.2)
+  - FLEX
+  - HandyJSON (~> 5.0.2)
   - RxCocoa (~> 5.1.0)
   - RxDataSources
   - RxSwift (~> 5.1.0)
   - SnapKit
+  - SSZipArchive (~> 2.4.3)
+  - SWXMLHash (~> 7.0.0)
+  - WCDB.swift
 
 SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - FLEX
   trunk:
     - AvoidCrash
     - Differentiator
+    - HandyJSON
     - RxCocoa
     - RxDataSources
     - RxRelay
     - RxSwift
     - SnapKit
+    - SSZipArchive
+    - SWXMLHash
+    - WCDB.swift
+    - WCDBOptimizedSQLCipher
 
 SPEC CHECKSUMS:
   AvoidCrash: 28c6916fe19bd2b84126b8dec7cbe61c9a12741d
   Differentiator: 886080237d9f87f322641dedbc5be257061b0602
+  FLEX: f21ee4f498eed3f8a1eded66b21939fd3b7a22ce
+  HandyJSON: 9e4e236f5d2dbefad5155a77417bbea438201c03
   RxCocoa: 32065309a38d29b5b0db858819b5bf9ef038b601
   RxDataSources: efee07fa4de48477eca0a4611e6d11e2da9c1114
   RxRelay: d77f7d771495f43c556cbc43eebd1bb54d01e8e9
   RxSwift: 1e2e1f9570186967f617e49128ed26ccf1bafc8e
   SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
+  SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
+  SWXMLHash: dd733a457e9c4fe93b1538654057aefae4acb382
+  WCDB.swift: 0c46e91e371d394235c840bbf767e23f3ef13a51
+  WCDBOptimizedSQLCipher: 7f03bb7c94ad164996f0fa87d0f76026f5ab0f92
 
-PODFILE CHECKSUM: 99f134f5d8b737cc44de5eb537f019e11f306c12
+PODFILE CHECKSUM: 9cfc05fbb447a2f78d8245c99df381a38bbfb8bb
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.15.0
