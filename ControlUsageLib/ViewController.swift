@@ -7,6 +7,7 @@
 
 import UIKit
 
+
 extension String {
     /// 计算文本长度
     func widthFor(font: UIFont, height: CGFloat = 20) -> CGFloat {
