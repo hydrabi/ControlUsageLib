@@ -168,4 +168,100 @@ extension CombindLearn {
         })
     }
     
+    //MARK: Empty
+    
+    /*
+     在 Swift 的 Combine 框架中，Empty 是一个特殊的 Publisher，它 不发送任何值，可以选择是否立即 正常完成（Finished） 或 不发送任何事件（适用于无限等待的场景）。它通常用于占位、错误处理或条件性数据流控制
+     */
+    
+    /*
+     Empty 的核心作用
+     表示一个“空”数据流
+
+     不发射任何 Output 值，直接完成（或保持沉默）。
+
+     类似于 Just 但不发送值，或 Future 但不执行异步操作。
+
+     控制数据流的完成行为
+
+     可以立即完成（completeImmediately: true），或永不完成（completeImmediately: false）。
+
+     占位或条件性分支
+
+     在需要返回 Publisher 但无实际数据时作为占位符（例如 flatMap 中条件不满足时返回 Empty）。
+     */
+    
+    func sampleEmpty() {
+        //立即完成
+        let emptyPublish = Empty<String,Never>(completeImmediately: true)
+        _ = emptyPublish.sink {
+            print("完成: \($0)")
+        } receiveValue: {
+            // 不会执行
+            print("收到值: \($0)")
+        }
+    }
+    
+    func sampleEmpty1() {
+        let emptyPublish = Empty<String,Never>(completeImmediately: false)
+        _ = emptyPublish.sink(receiveCompletion: { _ in
+            print("不会执行")
+        }, receiveValue: { _ in
+            print("不会执行")
+        })
+    }
+    
+    
+    /// 1. 占位 Publisher 当某个函数必须返回 Publisher，但当前无数据可发送时：
+    func sampleEmpty2(shouldFetch:Bool) -> AnyPublisher<String,Error> {
+        if shouldFetch {
+            return Just("test")
+                .setFailureType(to: Error.self)
+                .eraseToAnyPublisher()
+        }
+        else {
+            return Empty(completeImmediately: true)
+                .setFailureType(to: Error.self)
+                .eraseToAnyPublisher()
+        }
+    }
+    
+    //MARK: - Sequence
+    /*
+     Combine 提供了 sequence 方法，可以将一个 Swift 序列（Sequence） 转换为一个 Publisher，按顺序逐个发射元素，最后发送 .finished 完成事件。
+     
+     按顺序发射：元素按照序列的顺序逐个发出。
+     自动完成：发射完所有元素后，自动发送 .finished。
+     适用于 for-in 兼容的类型：如 Array、Range、Set、String（字符序列）等。
+     */
+    func sampleSequence() {
+        let arrayPublisher = [1,2,3,4].publisher
+        let cancelable = arrayPublisher.sink {
+            print("完成：\($0)")
+        } receiveValue: {
+            print("收到：\($0)")
+        }
+//        收到: 1
+//        收到: 2
+//        收到: 3
+//        收到: 4
+//        完成: finished
+    }
+    
+    func sampleSequence1() {
+        [1,2,3,4,5].publisher
+            .filter { $0 % 2 == 0 } // 只保留偶数
+            .map { $0 * 2 }         // 每个元素乘以 2
+            .sink { print($0) }     // 输出: 4, 8
+    }
+    
+    func sampleSequence2() {
+        let numbers = [1, 2, 3].publisher
+        let letters = ["A", "B", "C"].publisher
+        
+        Publishers.Zip(numbers, letters)
+            .sink {
+                print("\($0)-\($1)") // 输出: 1-A, 2-B, 3-C
+            }
+    }
 }
