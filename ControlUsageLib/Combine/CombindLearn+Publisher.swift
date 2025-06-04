@@ -264,4 +264,89 @@ extension CombindLearn {
                 print("\($0)-\($1)") // 输出: 1-A, 2-B, 3-C
             }
     }
+    
+    //MARK: - Share
+    /**
+     在 Swift 的 Combine 框架中，.share() 是一个操作符，用于 共享 Publisher 的订阅，避免重复执行昂贵的操作（如网络请求、数据库查询等）。它的核心作用是让多个订阅者 共享同一个 Publisher 的执行结果，而不是每个订阅者都触发一次独立的执行
+     
+     1. 避免重复执行副作用
+
+     默认情况下，冷 Publisher（Cold Publisher）（如 Future、URLSession.dataTaskPublisher）会在每次订阅时重新执行。
+     例如，如果有多个订阅者订阅同一个网络请求 Publisher，默认会发起多次请求。
+     .share() 可以让多个订阅者共享同一个 Publisher 的结果，只执行一次网络请求。
+     
+     2. 转换为热 Publisher（Hot Publisher）
+
+     .share() 会返回一个 引用计数的 Publisher，它在第一个订阅者订阅时开始执行，并在所有订阅者取消后重置。
+     后续的订阅者会直接接收已经缓存的值（如果 Publisher 尚未完成）。
+     
+     3. 适用于多个订阅者共享数据的场景
+
+     例如：
+     多个 UI 组件订阅同一个 API 请求结果。
+     多个观察者监听同一个数据库查询结果。
+     */
+    
+    func sampleShare1() {
+        func fetchData() -> AnyPublisher<String,Error> {
+            Deferred {
+                Future { promise in
+                    print("发起网络请求")
+                    DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+                        promise(.success("数据"))
+                    }
+                }
+            }.eraseToAnyPublisher()
+        }
+        // 创建共享 Publisher
+        sharedPublisher = fetchData().share()
+        //第一个订阅者
+        sharedPublisher?.sink { _ in
+            print("订阅者1完成")
+        } receiveValue: {
+            print("订阅者1收到: \($0)")
+        }.store(in: &cancelSet)
+
+        // 第二个订阅者（稍后订阅）
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.sharedPublisher?.sink { _ in
+                print("订阅者2完成")
+            } receiveValue: {
+                print("订阅者2收到: \($0)")
+            }.store(in: &self.cancelSet)
+
+        }
+    }
+    
+    //和上面的区别是没有share
+    func sampleShare2() {
+        func fetchData() -> AnyPublisher<String,Error> {
+            Deferred {
+                Future { promise in
+                    print("发起网络请求")
+                    DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+                        promise(.success("数据"))
+                    }
+                }
+            }.eraseToAnyPublisher()
+        }
+        // 创建共享 Publisher
+        commonPublisher = fetchData()
+        //第一个订阅者
+        commonPublisher?.sink { _ in
+            print("订阅者1完成")
+        } receiveValue: {
+            print("订阅者1收到: \($0)")
+        }.store(in: &cancelSet)
+
+        // 第二个订阅者（稍后订阅）
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.commonPublisher?.sink { _ in
+                print("订阅者2完成")
+            } receiveValue: {
+                print("订阅者2收到: \($0)")
+            }.store(in: &self.cancelSet)
+
+        }
+    }
 }

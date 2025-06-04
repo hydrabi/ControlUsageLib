@@ -23,6 +23,10 @@ class CombindLearn {
     
     var publisher:(any Publisher)? = nil
     
+    var sharedPublisher:Publishers.Share<AnyPublisher<String,Error>>? = nil
+    
+    var commonPublisher:AnyPublisher<String,Error>? = nil
+    
     //发布带有Published属性的属性将创建这种类型的发布者。使用$访问发布者
     @Published var username:String = ""
     
@@ -106,14 +110,7 @@ class CombindLearn {
     
     
     
-    //Sequence 发布者例子
-    func sampleSequence() {
-        let sequence = ["1","2","3"]
-        _ = sequence.publisher.sink(receiveValue: {
-            print($0)
-        })
-        print("")
-    }
+    
     
     //Fail 是 Combine 框架中的一个发布者类型，它专门用于立即发出一个失败（error）事件，而不发出任何值
 //    主要作用
