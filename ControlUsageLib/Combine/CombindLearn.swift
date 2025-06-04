@@ -28,20 +28,6 @@ class CombindLearn {
     
     var mBackgroundQueue:DispatchQueue = .init(label: "mBackgroundQueue")
     
-    func sampleJustAndSink() {
-        //管道从发布者 Just 开始，它用它定义的值（在本例中为整数 5）进行响应。输出类型为 <Integer>，失败类型为 <Never>
-        //然后管道有一个 map 操作符，它在转换值及其类型
-        //sink作为订阅者结束
-        let _ = Just(5).map { value -> String in
-            // do something with the incoming value here
-            // and return a string
-            return "a string"
-        }.sink { receivedValue in
-            // sink is the subscriber and terminates the pipeline
-            print("The end result was \(receivedValue)")
-        }
-    }
-    
     func sampleMap() {
         //map 经典操作符
         let _ = Just(5).map { value in
@@ -116,43 +102,9 @@ class CombindLearn {
         }
     }
     
-    // 当生成Future后立马就触发了过程
-    func sampleFuture() {
-        let futurePublisher = Future<Int, Never> { promise in
-            print("Future began processing")
-            
-            let number = Int.random(in: 1...10)
-            print("Future emitted number: \(number)")
-            promise(Result.success(number))
-            
-        }.print("Publisher event")
-        
-        
-        cancelAble = futurePublisher.sink {
-            print ("Future stream received: \($0)")
-        }
-    }
     
-    //不会立刻触发 只有添加了订阅者才会触发 不添加的话不会触发
-    func sampleFutureAndDeferred() {
-        let deferredPublisher = Deferred {
-            Future<Int, Error> { promise in
-                print("Future began processing")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    let number = Int.random(in: 1...10)
-                    print("Future emitted number: \(number)")
-                    promise(Result.success(number))
-                }
-            }
-        }.eraseToAnyPublisher()
-        
-        
-        cancelAble = deferredPublisher.sink(receiveCompletion: { result in
-            print ("reslt is: \(result)")
-        }, receiveValue: {
-            print ("Future stream received: \($0)")
-        })
-    }
+    
+    
     
     //Sequence 发布者例子
     func sampleSequence() {
