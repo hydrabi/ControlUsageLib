@@ -82,17 +82,19 @@ class CombindLearn {
         }
     }
     
+    //延迟发布服务器在运行提供的闭包为订阅服务器创建值之前等待订阅服务器
     func defereedTest() {
         var outputValue = false
         let deferredPublisher = Deferred {
             Future<Bool,Error> { promise in
                 self.deferredAsyncApiCall(sabotage: true) { grantedAccess, err in
+                    print("Future began processing")
                     if let err = err {
                         return promise(.failure(err))
                     }
                     return promise(.success(grantedAccess))
                 }
-            }
+            }.print("Publisher event")
         }.eraseToAnyPublisher()
         
         
@@ -112,8 +114,6 @@ class CombindLearn {
             print(".sink() received value: ", value)
             outputValue = value
         }
-        
-        
     }
     
     // 当生成Future后立马就触发了过程
@@ -153,6 +153,40 @@ class CombindLearn {
             print ("Future stream received: \($0)")
         })
     }
+    
+    //Sequence 发布者例子
+    func sampleSequence() {
+        let sequence = ["1","2","3"]
+        _ = sequence.publisher.sink(receiveValue: {
+            print($0)
+        })
+        print("")
+    }
+    
+    //Fail 是 Combine 框架中的一个发布者类型，它专门用于立即发出一个失败（error）事件，而不发出任何值
+//    主要作用
+//    立即发送错误：当创建后，Fail 会立即发送指定的错误并终止。
+//    错误处理测试：在开发过程中，用于模拟错误场景，测试订阅者的错误处理逻辑。
+//    替代失败场景：在需要返回发布者的 API 中，可以用 Fail 来表示操作失败的情况。
+    func sampleFailPublish() {
+        enum MyError:Error {
+            case exampleError
+        }
+        
+        let failPublisher = Fail<Int,MyError>(error: MyError.exampleError)
+        let subscription = failPublisher.sink { completion in
+            switch completion {
+            case .finished:
+                print("完成")
+            case .failure(let error):
+                print("收到错误:\(error)")
+            }
+        } receiveValue: { value in
+            print("收到值:\(value)")
+        }
+    }
+    
+    
     
     /// Subjects 可以通过调用 .send(_:) 方法来将值“注入”到流中 一个 subject 还可以向多个订阅者广播消息
     /// CurrentValueSubject 需要一个初始值并记住它当前的值

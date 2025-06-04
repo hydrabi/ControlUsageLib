@@ -107,7 +107,6 @@
 		026E4D802B2E99BF00A0858D /* ControlUsageLib */ = {
 			isa = PBXGroup;
 			children = (
-				02E314362C21887800000B8E /* SwiftTask */,
 				02E314332C21858000000B8E /* Combine */,
 				02747ECA2BC7906400D74A35 /* ThirdParty */,
 				02BE7F542BC56BE100013433 /* Resource */,
@@ -275,13 +274,6 @@
 				02584FA12C26CBF600756A42 /* GithubAPI.swift */,
 			);
 			path = Combine;
-			sourceTree = "<group>";
-		};
-		02E314362C21887800000B8E /* SwiftTask */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = SwiftTask;
 			sourceTree = "<group>";
 		};
 		02EF34632B94314300E1D84B /* Useage */ = {

@@ -78,7 +78,10 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
 
         combind = CombindLearn()
-        combind?.tryScanSample()
+        combind?.sampleSequence()
+        
+        let wcdb = WCDBTestObject()
+        wcdb.test()
     }
 
 
