@@ -46,40 +46,10 @@
             filePath = "ControlUsageLib/Combine/CombindLearn.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "119"
-            endingLineNumber = "119"
+            startingLineNumber = "122"
+            endingLineNumber = "122"
             landmarkName = "CombindLearn"
             landmarkType = "3">
-            <Locations>
-               <Location
-                  uuid = "8E98645F-617F-4713-9280-B4A45433B498 - 132ff519b561bc31"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ControlUsageLib.CombindLearn.sampleFailPublish() -&gt; ()"
-                  moduleName = "ControlUsageLib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bizhifeng/Documents/code/GitControlUsageLib/ControlUsageLib/Combine/CombindLearn.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "123"
-                  endingLineNumber = "123">
-               </Location>
-               <Location
-                  uuid = "8E98645F-617F-4713-9280-B4A45433B498 - 132ff519b561bc77"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ControlUsageLib.CombindLearn.sampleFailPublish() -&gt; ()"
-                  moduleName = "ControlUsageLib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bizhifeng/Documents/code/GitControlUsageLib/ControlUsageLib/Combine/CombindLearn.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "125"
-                  endingLineNumber = "125">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -92,40 +62,10 @@
             filePath = "ControlUsageLib/Combine/CombindLearn.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "129"
-            endingLineNumber = "129"
+            startingLineNumber = "132"
+            endingLineNumber = "132"
             landmarkName = "sampleFailPublish()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "5EDC5944-88C1-419A-9BD2-B08A1511476A - 2ad8b37aacea497b"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Combine.Subscribers.Completion&lt;MyError&gt;) -&gt; () in ControlUsageLib.CombindLearn.sampleFailPublish() -&gt; ()"
-                  moduleName = "ControlUsageLib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bizhifeng/Documents/code/GitControlUsageLib/ControlUsageLib/Combine/CombindLearn.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "129"
-                  endingLineNumber = "129">
-               </Location>
-               <Location
-                  uuid = "5EDC5944-88C1-419A-9BD2-B08A1511476A - 2ad8b37aacea497b"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Combine.Subscribers.Completion&lt;MyError&gt;) -&gt; () in ControlUsageLib.CombindLearn.sampleFailPublish() -&gt; ()"
-                  moduleName = "ControlUsageLib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bizhifeng/Documents/code/GitControlUsageLib/ControlUsageLib/Combine/CombindLearn.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "129"
-                  endingLineNumber = "129">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -138,40 +78,10 @@
             filePath = "ControlUsageLib/Combine/CombindLearn.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "95"
-            endingLineNumber = "95"
+            startingLineNumber = "98"
+            endingLineNumber = "98"
             landmarkName = "defereedTest()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "BE40CA4B-2AC9-480F-989C-E9C9076EDD38 - ad3bb677cf678ccb"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 (Combine.Subscribers.Completion&lt;Swift.Error&gt;) -&gt; () in ControlUsageLib.CombindLearn.defereedTest() -&gt; ()"
-                  moduleName = "ControlUsageLib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bizhifeng/Documents/code/GitControlUsageLib/ControlUsageLib/Combine/CombindLearn.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "95"
-                  endingLineNumber = "95">
-               </Location>
-               <Location
-                  uuid = "BE40CA4B-2AC9-480F-989C-E9C9076EDD38 - ad3bb677cf678ccb"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 (Combine.Subscribers.Completion&lt;Swift.Error&gt;) -&gt; () in ControlUsageLib.CombindLearn.defereedTest() -&gt; ()"
-                  moduleName = "ControlUsageLib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/bizhifeng/Documents/code/GitControlUsageLib/ControlUsageLib/Combine/CombindLearn.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "95"
-                  endingLineNumber = "95">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

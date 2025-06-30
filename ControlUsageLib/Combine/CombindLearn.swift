@@ -27,6 +27,9 @@ class CombindLearn {
     
     var commonPublisher:AnyPublisher<String,Error>? = nil
     
+    var multicastSubscribe:Publishers.Multicast<Publishers.Sequence<[Int],Never>,
+                                                PassthroughSubject<Int,Never>>? = nil
+    
     //发布带有Published属性的属性将创建这种类型的发布者。使用$访问发布者
     @Published var username:String = ""
     

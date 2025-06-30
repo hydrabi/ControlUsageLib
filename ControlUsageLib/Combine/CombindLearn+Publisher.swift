@@ -349,4 +349,131 @@ extension CombindLearn {
 
         }
     }
+    
+    //MARK: - Multicast
+    /**
+     1. 共享 Publisher 执行（避免重复工作）
+     问题：默认情况下，每次调用 sink 或 assign 都会创建一个新的订阅，导致副作用（如网络请求、计算）重复执行。
+
+     解决：Multicast 让多个订阅者共享同一个 Publisher 的输出，确保副作用只执行一次。
+
+     示例：
+
+     swift
+     let sharedPublisher = somePublisher
+         .multicast { PassthroughSubject() } // 共享底层 Publisher
+     2. 手动控制发布时机（ConnectablePublisher）
+     普通 Publisher：订阅后立即开始发射数据。
+
+     Multicast 转换后的 Publisher：需要显式调用 connect() 才会开始发射数据。
+
+     适用场景：延迟数据流直到所有订阅者就绪。
+
+     3. 将冷发布者（Cold Publisher）转为热发布者（Hot Publisher）
+     冷发布者（如 Future, URLSession.dataTaskPublisher）：每次订阅都会重新执行。
+
+     热发布者：共享同一份数据流，Multicast 通过 Subject 广播数据给所有订阅者。
+     
+     关键机制
+     1. 基于 Subject 的广播
+     Multicast 需要传入一个 Subject（如 PassthroughSubject 或 CurrentValueSubject），用于向所有订阅者广播数据。
+
+     数据流通过 Subject 共享，而非重新执行原始 Publisher。
+
+     2. ConnectablePublisher 协议
+     multicast 返回的类型遵循 ConnectablePublisher，必须调用 connect() 才会启动。
+
+     适合需要延迟执行或等待多个订阅者的场景。
+
+     3. 资源管理
+     调用 connect() 返回一个 Cancellable，用于手动终止数据流。
+
+     如果未调用 connect()，即使有订阅者，也不会发射数据。
+
+     适用场景
+     1. 避免重复网络请求
+     swift
+     func fetchData() -> AnyPublisher<Data, Error> {
+         URLSession.shared.dataTaskPublisher(for: url)
+             .map(\.data)
+             .multicast { PassthroughSubject() }
+             .eraseToAnyPublisher()
+     }
+
+     let sharedPublisher = fetchData()
+     // 多个订阅者共享同一个请求
+     sharedPublisher.sink(...)
+     sharedPublisher.sink(...)
+     sharedPublisher.connect() // 只发起一次请求
+     2. 等待多个订阅者就绪
+     swift
+     let multicasted = publisher.multicast(...)
+
+     // 先添加所有订阅者
+     multicasted.sink(...)
+     multicasted.sink(...)
+
+     // 再统一启动
+     multicasted.connect()
+     3. 冷发布者转热发布者
+     swift
+     let coldPublisher = [1, 2, 3].publisher
+     let hotPublisher = coldPublisher.multicast { PassthroughSubject() }
+     与 share() 的区别
+     特性    Multicast    share()
+     执行控制    手动调用 connect() 启动    自动在第一个订阅时启动
+     适用场景    需要精确控制发布时机    简单的共享订阅
+     底层机制    依赖 Subject 广播    内部使用 Multicast + 自动连接
+     取消行为    需手动管理 connect() 的 Cancellable    自动管理生命周期
+     总结
+     何时使用 Multicast？
+
+     需要手动控制数据流启动时机（如等待所有订阅者就绪）。
+
+     确保副作用只执行一次（如共享网络请求）。
+
+     将冷发布者转为热发布者。
+
+     何时用 share()？
+
+     简单的共享订阅场景，无需手动控制。
+
+     通过合理使用 Multicast，可以显著优化 Combine 数据流的性能和资源利用率。
+     */
+    
+    func multicastSample1() {
+        let publisher = [1,2,3].publisher
+            .map { value in
+                print("Processing:",value)
+                return value
+            }
+        // 转换为 ConnectablePublisher
+        multicastSubscribe = publisher.multicast {
+            PassthroughSubject<Int,Never>()
+        }
+        // 订阅者1
+        multicastSubscribe!
+            .sink { value in
+                print("Subscriber 1:",value)
+            }.store(in: &cancelSet)
+        // 订阅者2
+        multicastSubscribe!
+            .sink { value in
+                print("Subscriber 2:", value)
+            }.store(in: &cancelSet)
+        // 只有调用 connect() 后，Publisher 才会开始发射数据
+        let connection = multicastSubscribe!.connect()
+        // 输出：
+//        Processing: 1
+//        Processing: 2
+//        Processing: 3
+//        Subscriber 1: 1
+//        Subscriber 2: 1
+//        Subscriber 1: 2
+//        Subscriber 2: 2
+//        Subscriber 1: 3
+//        Subscriber 2: 3
+        
+//        connection.cancel() // 终止数据流
+    }
 }
