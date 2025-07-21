@@ -476,4 +476,31 @@ extension CombindLearn {
         
 //        connection.cancel() // 终止数据流
     }
+    
+    /**
+     @Published 是 SwiftUI 和 Combine 框架中常用的属性包装器，它可以将普通属性转换为能够发布变化的 Publisher。
+     
+     注意事项
+
+     @Published 只能在类中使用，不能用于结构体或枚举
+     属性必须声明为变量 (var)，不能是常量 (let)
+     发布发生在属性值 被设置后，而不是在 willSet 时
+     在 SwiftUI 中，@Published 属性变化会自动触发视图更新
+     与普通 Publisher 的区别
+
+     特性    @Published    普通 Publisher
+     声明方式    属性包装器    显式创建 (Just, Future 等)
+     自动发布    属性变化时自动发布    需要手动控制发布时机
+     主要用途    模型数据绑定    各种事件流处理
+     订阅方式    通过 $ 前缀访问    直接订阅
+     @Published 简化了属性观察和发布的过程，特别适合在 MVVM 架构中作为视图模型的数据源。
+     */
+    
+    func publishedSample1() {
+        $username.sink { newName in
+            print("用户名变更为: \(newName)")
+        }.store(in: &cancelSet)
+
+        username = "1"
+    }
 }
