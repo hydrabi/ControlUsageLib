@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		023AE7C22E32605800A92421 /* CombindLearn+Control.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023AE7C12E32605800A92421 /* CombindLearn+Control.swift */; };
 		02584FA22C26CBF600756A42 /* GithubAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02584FA12C26CBF600756A42 /* GithubAPI.swift */; };
 		026E4D822B2E99BF00A0858D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026E4D812B2E99BF00A0858D /* AppDelegate.swift */; };
 		026E4D842B2E99BF00A0858D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026E4D832B2E99BF00A0858D /* SceneDelegate.swift */; };
@@ -39,6 +40,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		023AE7C12E32605800A92421 /* CombindLearn+Control.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CombindLearn+Control.swift"; sourceTree = "<group>"; };
 		02584FA12C26CBF600756A42 /* GithubAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubAPI.swift; sourceTree = "<group>"; };
 		026E4D7E2B2E99BF00A0858D /* ControlUsageLib.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ControlUsageLib.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		026E4D812B2E99BF00A0858D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -272,6 +274,7 @@
 		02E314332C21858000000B8E /* Combine */ = {
 			isa = PBXGroup;
 			children = (
+				023AE7C12E32605800A92421 /* CombindLearn+Control.swift */,
 				02E314342C21858F00000B8E /* CombindLearn.swift */,
 				02584FA12C26CBF600756A42 /* GithubAPI.swift */,
 				02DC559A2DBA697400B55214 /* CombindLearn+Publisher.swift */,
@@ -443,6 +446,7 @@
 				02EF34692B944BC000E1D84B /* UITableViewCell+RxSwift.swift in Sources */,
 				02CBB2482BD0C4B90004EFDC /* FixtureType+RelativeAndAbsolute.swift in Sources */,
 				029CF7082B39B76800153685 /* UILable+AttributeText.swift in Sources */,
+				023AE7C22E32605800A92421 /* CombindLearn+Control.swift in Sources */,
 				02CBB24C2BD120830004EFDC /* FixtureType+Transform.swift in Sources */,
 				02DC559B2DBA697400B55214 /* CombindLearn+Publisher.swift in Sources */,
 				02CBB24A2BD0C9550004EFDC /* FixtureType+Common.swift in Sources */,

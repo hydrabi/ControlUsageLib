@@ -110,11 +110,67 @@ extension CombindLearn {
      错误抛出：累积函数可以抛出错误
      错误传播：当抛出错误时，会终止发布流并传播错误
      即时发射：每次成功计算后立即发出当前结果
+     
+     错误处理
+     错误传播机制
+     当 tryScan 的闭包抛出错误时：
+
+     发布流会立即终止
+
+     发送 failure 完成事件
+
+     不再接收或处理任何后续值
      */
     
     func tryScanSample1() {
         enum MyError:Error {
             case invalidValue
         }
+        
+        let numbers = [1,2,3,4,5].publisher
+        numbers.tryScan(0) { accumulated, current in
+            let newValue = accumulated + current
+            if newValue > 7 {
+                throw MyError.invalidValue
+            }
+            return newValue
+        }
+        .sink {
+            switch $0 {
+            case .failure(let error):print("Error:\(error)")
+            case .finished: print("Finished successfully")
+            }
+        } receiveValue: {
+            print($0)
+        }
+        .store(in: &cancelSet)
+        // 输出:
+        // 1
+        // 3
+        // 6
+        // Error: invalidValue
+    }
+    
+    func tryScanSample2() {
+        let jsonParts = [
+            "{\"name\":\"John\", \"age\":",
+            "30, \"city\":\"New ",
+            "York\"}"
+        ].publisher
+        
+        jsonParts.tryScan("") { accumulated, part in
+            let newString = accumulated + part
+            if let data = newString.data(using: .utf8),
+               let _ = try? JSONSerialization.jsonObject(with: data,options: []) {
+                return newString
+            }
+            return newString
+        }
+        .tryMap { try JSONSerialization.jsonObject(with: $0.data(using: .utf8)!) }
+        .sink(
+                receiveCompletion: { print($0) },
+                receiveValue: { print("Parsed JSON: \($0)") }
+            )
+        .store(in: &cancelSet)
     }
 }
