@@ -173,4 +173,426 @@ extension CombindLearn {
             )
         .store(in: &cancelSet)
     }
+    
+    //MARK: - setFailureType
+    
+    /**
+     setFailureType(to:) 是 Combine 框架中的一个操作符，用于改变 Publisher 的 Failure 类型而不改变其实际发出的值。
+
+     基本概念
+     在 Combine 中，Publisher 有两个关联类型：
+
+     Output: 发布的值类型
+
+     Failure: 错误类型（必须符合 Error 协议）
+
+     setFailureType(to:) 允许你将 Publisher 的 Failure 类型转换为另一种 Error 类型，而不需要实际发送任何错误。
+
+     使用场景
+     当你有一个不会失败的 Publisher（如 Just 或 Publishers.Sequence），但需要将其转换为具有特定 Failure 类型的 Publisher 时，这个操作符非常有用。
+     
+     重要注意事项
+     setFailureType(to:) 只改变类型系统对 Publisher 的认知，不会实际改变 Publisher 的行为。
+
+     它只能用于 Failure 类型为 Never 的 Publisher（即不会失败的 Publisher）。
+
+     如果你尝试对可能失败的 Publisher 使用此操作符，编译器会报错。
+     */
+    
+    func setFailureTypeSample1() {
+        enum MyError:Error {
+            case someError
+        }
+        
+        let justPublisher = Just("Hello")
+        // 将 Failure 类型从 Never 转换为 MyError
+        // 现在类型是 Publisher<String, MyError>
+        let publisherWithError = justPublisher.setFailureType(to: MyError.self)
+    }
+    
+    func setFailureTypeSample2() {
+        let sequencePublisher = [1,2,3].publisher
+        sequencePublisher.setFailureType(to: URLError.self)
+            .tryMap { value in
+                // 这里可以抛出错误
+//                try someThrowingFunction(value)
+            }
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        print("完成")
+                    case .failure(let error):
+                        print("错误: \(error)") // 错误类型是 URLError
+                    }
+                },
+                receiveValue: { value in
+                    print("收到值: \(value)")
+                }
+            )
+            .store(in: &cancelSet)
+    }
+    
+    //MARK: - tryMap
+    
+    /**
+     tryMap 与常规的 map 操作符类似，都是对 Publisher 发出的值进行转换，但关键区别在于：
+
+     map: 执行同步转换，不能抛出错误
+
+     tryMap: 执行可能抛出错误的转换
+     
+     主要特点
+     转换值：像普通 map 一样转换输入值
+
+     错误处理：允许转换闭包中抛出错误
+
+     Failure 类型变化：将 Publisher 的 Failure 类型改为 Error（如果原先不是）
+     
+     错误处理机制
+     当 tryMap 的闭包抛出错误时：
+
+     立即发送 .failure 完成事件
+
+     取消上游订阅
+
+     不再发送任何值
+
+     错误类型会被包装为 Publisher 的 Failure 类型（通常变为通用的 Error 类型）
+     
+     注意事项
+     使用 tryMap 后，Publisher 的 Failure 类型会变为 Error，可能需要后续使用 mapError 进行特定错误类型的转换
+
+     抛出错误会立即终止事件流
+
+     在闭包中执行耗时操作时，应考虑使用适当的调度器
+
+     tryMap 在处理可能失败的转换时非常有用，特别是在数据验证、解析和转换场景中。
+     */
+    
+    func tryMapSample1() {
+        let numbers = [1,2,3,4].publisher
+        numbers.tryMap { value in
+            if value % 2 == 0 {
+                return value * 2
+            }
+            else {
+                throw NSError(domain: "不允许奇数",
+                              code: 0)
+            }
+        }
+        .sink { completion in
+            switch completion {
+            case .finished:
+                print("完成")
+            case .failure(let error):
+                print("\(error.localizedDescription)")
+            }
+        } receiveValue: {
+            print($0)
+        }
+        .store(in: &cancelSet)
+        // 输出:
+        // 错误: 奇数不被允许
+    }
+    
+    func tryMapSample2() {
+        let urlStrings = ["https://apple.com", "无效URL", "https://example.com"].publisher
+        urlStrings.tryMap { string in
+            guard let url = URL(string: string) else {
+                throw URLError(.badURL)
+            }
+            return url
+        }
+        .sink {
+            print($0)
+        } receiveValue: {
+            print("有效URL: \($0)")
+        }
+        .store(in: &cancelSet)
+        // 输出:
+        // 有效URL: https://apple.com
+        // failure(Error Domain=NSURLErrorDomain Code=-1000 "bad URL" UserInfo={NSLocalizedDescription=bad URL})
+    }
+    
+    func tryMapSample3() {
+        struct User:Decodable {
+            let name:String
+        }
+        
+        let jsonData = """
+            {"name": "John"},
+            {"name": "Alice"},
+            {"invalid": "data"}
+        """.data(using: .utf8)!
+        
+        Just(jsonData)
+            .tryMap { data in
+                let decoder = JSONDecoder()
+                return try decoder.decode([User].self, from: data)
+            }
+            .sink {
+                print($0)
+            } receiveValue: {
+                print("有效URL: \($0)")
+            }
+            .store(in: &cancelSet)
+    }
+    
+    //MARK: - flapMap
+    /**
+     flatMap 是 Combine 框架中一个强大且常用的操作符，用于处理异步序列的转换和嵌套 Publisher 的场景。
+     
+     基本概念
+     flatMap 的主要功能是：
+     将每个输入值转换为一个新的 Publisher
+     将这些 Publisher "扁平化"（flatten）为单个事件流
+     
+     核心特点
+     一对多转换：一个输入值可以产生多个输出值
+     异步处理：适合处理异步操作（如网络请求）
+     自动管理订阅：自动处理内部 Publisher 的生命周期
+     
+     注意事项
+     内存管理：默认情况下 flatMap 会订阅所有生成的 Publisher，可能导致内存问题
+     顺序不保证：内部 Publisher 发出的值可能不按原始顺序到达
+     取消行为：当外部 Publisher 取消时，所有内部 Publisher 也会被取消
+     背压处理：使用 maxPublishers 参数可以控制并发量
+     
+     替代方案
+     如果只需要转换值而不需要嵌套 Publisher，使用 map
+     如果需要严格按顺序处理，考虑使用 concatMap（Combine 中没有内置，但可以实现类似行为）
+     flatMap 是处理复杂异步数据流的强大工具，特别适合网络请求链式调用、数据库操作等场景。
+     */
+    
+    func flapMapSample1() {
+        func fetchUser(id:Int)->AnyPublisher<String,Never> {
+            Just("用户\(id)详情")
+                .delay(for: .seconds(1),
+                       scheduler: RunLoop.main,
+                       options: .none)
+                .eraseToAnyPublisher()
+        }
+        
+        let userIDs = [1,2,3].publisher
+        userIDs.flatMap { id in
+            fetchUser(id: id)
+        }
+        .sink { userDetail in
+            print(userDetail)
+        }
+        .store(in: &cancelSet)
+        
+        // 限制同时进行的请求数量
+        // 最多同时2个请求
+        userIDs.flatMap(maxPublishers: .max(2)) { id in
+            fetchUser(id: id)
+        }
+        .sink {
+            print($0)
+        }
+        .store(in: &cancelSet)
+    }
+    
+    func flapMapSample2() {
+        // 先获取用户ID，再获取用户详情
+        func getUserID() -> AnyPublisher<Int,Error> {
+            Just(123)
+                .setFailureType(to: Error.self)
+                .eraseToAnyPublisher()
+        }
+        
+        func getUserDetail(id:Int) -> AnyPublisher<String,Error> {
+            Future { promise in
+                DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+                    promise(.success("用户\(id)的详细信息"))
+                }
+            }.eraseToAnyPublisher()
+        }
+        
+        getUserID()
+            .flatMap { id in
+                getUserDetail(id: id)
+            }
+            .sink {
+                print($0)
+            } receiveValue: {
+                print($0)
+            }
+            .store(in: &cancelSet)
+    }
+    
+    @available(iOS 14.0, *)
+    func flapMapSample3() {
+        struct APIError:Error {}
+        
+        func fetchData() -> AnyPublisher<Data,APIError> {
+            Fail(error: APIError()).eraseToAnyPublisher()
+        }
+        
+        Just("Request")
+            .flatMap { _ in
+                fetchData()
+            }
+            .sink {
+                switch $0 {
+                case .failure(let error):
+                    print("错误:\(error)")
+                case .finished:
+                    print("完成")
+                }
+            } receiveValue: { _ in
+                print("收到数据")
+            }
+            .store(in: &cancelSet)
+    }
+    
+    //MARK: - compactMap
+    
+    /**
+     compactMap 是 Combine 中一个实用的操作符，它结合了 map 和 filter 的功能，专门用于处理可选值转换的场景。
+     
+     基本概念
+     compactMap 的主要功能是：
+     对每个输入值执行转换（类似 map）
+     自动过滤掉转换结果为 nil 的值（类似 filter）
+     
+     核心特点
+     转换+过滤：一步完成值转换和 nil 过滤
+     类型安全：输出类型是非可选类型
+     简化代码：避免显式的 map + filter 组合
+     
+     与相关操作符对比
+     操作符    功能描述
+     map    单纯转换值，不处理 nil
+     filter    基于条件过滤值，不改变值类型
+     compactMap    先转换值，然后自动过滤掉结果为 nil 的项
+     tryMap    可能抛出错误的转换，不自动处理 nil
+     */
+    
+    func compactMapSample1() {
+        let strings = ["1","2","three","4"].publisher
+        strings.compactMap {
+            Int($0)
+        }
+        .sink {
+            print($0)
+        }
+        .store(in: &cancelSet)
+    }
+    
+    func compactMapSample2() {
+        struct User {
+            var name:String?
+        }
+        
+        let users = [User(name: "Alice"),User(name: nil),User(name: "Bob")].publisher
+        users.compactMap { $0.name }
+            .sink { print($0) }
+            .store(in: &cancelSet)
+    }
+    
+    //MARK: - replaceEmpty
+    /**
+     replaceEmpty 是 Combine 框架中一个实用的操作符，专门用于处理空序列的情况。
+     
+     基本概念
+     replaceEmpty 的主要功能是：
+     检测 Publisher 是否没有发出任何值就完成了
+     如果是空序列，则替换为一个默认值
+     如果发出了值，则原样传递这些值
+     
+     核心特点
+     空序列处理：专门针对不发射任何值就完成的 Publisher
+     保底值：确保订阅者至少能收到一个值
+     类型安全：默认值必须与 Publisher 的 Output 类型匹配
+     */
+    
+    func replaceEmptySample1() {
+        let emptyArray = [Int]().publisher
+        emptyArray.replaceEmpty(with: 0)
+            .sink { print("收到值:\($0)") }
+            .store(in: &cancelSet)
+    }
+    
+    //MARK: - replaceError
+    
+    /**
+     replaceError 是 Combine 框架中用于错误处理的重要操作符，它可以将失败的 Publisher 转换为不会失败的 Publisher。
+     
+     基本概念
+     replaceError 的主要功能是：
+     拦截 Publisher 发出的错误
+     用指定的默认值替换错误
+     将 Failure 类型从具体的 Error 类型改为 Never
+     
+     核心特点
+     错误恢复：将失败事件转换为正常值
+     类型转换：将可能失败的 Publisher 转换为不会失败的 Publisher
+     简单处理：提供了一种快速处理错误的轻量级方案
+     */
+    
+    func replaceErrorSample1() {
+        enum MyError:Error {
+            case someError
+        }
+        
+        let failingPublisher = Fail<Int,MyError>(error: .someError)
+        failingPublisher
+            .replaceError(with: 0)
+            .sink { print("完成：\($0)") }
+        receiveValue: { print("收到值：\($0)") }
+            .store(in: &cancelSet)
+    }
+    
+    func replaceErrorSample2() {
+        struct NetworkService {
+            func fetchData() -> AnyPublisher<Data,Error> {
+                Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()
+            }
+        }
+    }
+    
+    //MARK: - removeDuplicates
+    /**
+     removeDuplicates 是 Combine 框架中一个实用的操作符，用于过滤连续重复的值，确保 Publisher 不会连续发出相同的值。
+     
+     基本概念
+     removeDuplicates 会：
+     比较当前发出的值与上一个值
+     如果相同，则过滤掉当前值
+     如果不同，则允许值通过
+     */
+    func removeDuplicatesSample1() {
+        let numbers = [1, 2, 2, 3, 3, 3, 4, 5, 5].publisher
+        numbers.removeDuplicates().sink { print($0) }
+            .store(in: &cancelSet)
+        // 输出: 1, 2, 3, 4, 5
+    }
+    
+    //当你的类型不符合 Equatable 或需要特殊比较逻辑时
+    func removeDuplicatesSample2() {
+        struct Person {
+            let id: Int
+            let name: String
+        }
+
+        let people = [
+            Person(id: 1, name: "Alice"),
+            Person(id: 1, name: "Alice"), // 重复
+            Person(id: 2, name: "Bob"),
+            Person(id: 2, name: "Bob"),   // 重复
+            Person(id: 3, name: "Charlie")
+        ].publisher
+        
+        people.removeDuplicates { prev, current in
+            prev.id == current.id
+        }
+        .sink { print("\($0.id): \($0.name)") }
+        .store(in: &cancelSet)
+        // 输出:
+        // 1: Alice
+        // 2: Bob
+        // 3: Charlie
+    }
 }
