@@ -78,7 +78,7 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
 
         combind = CombindLearn()
-        combind?.scanSample2()
+        combind?.collectSample3()
         
        
     }
