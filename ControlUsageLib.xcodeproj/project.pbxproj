@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		023AE7C22E32605800A92421 /* CombindLearn+Control.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023AE7C12E32605800A92421 /* CombindLearn+Control.swift */; };
 		02584FA22C26CBF600756A42 /* GithubAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02584FA12C26CBF600756A42 /* GithubAPI.swift */; };
+		025A393B2E97B10400D0D135 /* PagetConcurrencyRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 025A393A2E97B10400D0D135 /* PagetConcurrencyRequest.swift */; };
 		026E4D822B2E99BF00A0858D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026E4D812B2E99BF00A0858D /* AppDelegate.swift */; };
 		026E4D842B2E99BF00A0858D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026E4D832B2E99BF00A0858D /* SceneDelegate.swift */; };
 		026E4D862B2E99BF00A0858D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026E4D852B2E99BF00A0858D /* ViewController.swift */; };
@@ -42,6 +43,7 @@
 /* Begin PBXFileReference section */
 		023AE7C12E32605800A92421 /* CombindLearn+Control.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CombindLearn+Control.swift"; sourceTree = "<group>"; };
 		02584FA12C26CBF600756A42 /* GithubAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubAPI.swift; sourceTree = "<group>"; };
+		025A393A2E97B10400D0D135 /* PagetConcurrencyRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagetConcurrencyRequest.swift; sourceTree = "<group>"; };
 		026E4D7E2B2E99BF00A0858D /* ControlUsageLib.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ControlUsageLib.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		026E4D812B2E99BF00A0858D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		026E4D832B2E99BF00A0858D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -91,6 +93,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		025A39392E97B09C00D0D135 /* PagetConcurrencyRequest */ = {
+			isa = PBXGroup;
+			children = (
+				025A393A2E97B10400D0D135 /* PagetConcurrencyRequest.swift */,
+			);
+			path = PagetConcurrencyRequest;
+			sourceTree = "<group>";
+		};
 		026E4D752B2E99BF00A0858D = {
 			isa = PBXGroup;
 			children = (
@@ -112,6 +122,7 @@
 		026E4D802B2E99BF00A0858D /* ControlUsageLib */ = {
 			isa = PBXGroup;
 			children = (
+				025A39392E97B09C00D0D135 /* PagetConcurrencyRequest */,
 				02A074652E5CA331005E95C3 /* Generic */,
 				02E314332C21858000000B8E /* Combine */,
 				02747ECA2BC7906400D74A35 /* ThirdParty */,
@@ -472,6 +483,7 @@
 				026E4D862B2E99BF00A0858D /* ViewController.swift in Sources */,
 				02747ECD2BC790AF00D74A35 /* WCDBUsage.swift in Sources */,
 				029CF70E2B39C2BB00153685 /* CollectionSample.swift in Sources */,
+				025A393B2E97B10400D0D135 /* PagetConcurrencyRequest.swift in Sources */,
 				02584FA22C26CBF600756A42 /* GithubAPI.swift in Sources */,
 				02D395C32B4A4EDC006EBA8C /* String+Operation.swift in Sources */,
 				026E4D822B2E99BF00A0858D /* AppDelegate.swift in Sources */,
