@@ -595,4 +595,83 @@ extension CombindLearn {
         // 2: Bob
         // 3: Charlie
     }
+    
+    //MARK: - collect
+    /**
+     collect 是 Combine 框架中一个非常有用的操作符，它可以将多个单独的值"收集"起来，然后以数组的形式一次性发布。下面将详细介绍它的各种用法和场景。
+
+     基本用法
+     最简单的 collect() 形式不带参数，它会收集上游发布者发出的所有值，直到上游发布者完成，然后以一个数组的形式发出所有收集到的值。
+     */
+    
+    func collectSample1() {
+        //最简单的 collect() 形式不带参数，它会收集上游发布者发出的所有值，直到上游发布者完成，然后以一个数组的形式发出所有收集到的值。
+        let numbers = [1, 2, 3, 4, 5].publisher
+        numbers.collect()
+            .sink { print($0)}
+            .store(in: &cancelSet)
+        // 输出: [1, 2, 3, 4, 5]
+    }
+    
+    //collect(_ count: Int) 可以指定每次收集多少个值后就发出数组：
+    func collectSample2() {
+        let numbers = [1, 2, 3, 4, 5, 6, 7, 8].publisher
+        numbers.collect(3)
+            .sink { print($0) }
+            .store(in: &cancelSet)
+        // 输出:
+        // [1, 2, 3]
+        // [4, 5, 6]
+        // [7, 8]  // 最后一组不足3个也会发出
+    }
+    
+    func collectSample3() {
+        let timerPub = Timer.publish(every: 0.5, on: .main, in: .default)
+            .autoconnect()
+            .map { _ in
+                let randomValue = Int.random(in: 1...100)
+                print("\(randomValue)")
+                return randomValue
+            }
+        timerPub
+            .collect(.byTime(RunLoop.main, 2.0))
+            .sink { print("\(Date()):\($0)")}
+            .store(in: &cancelSet)
+    }
+    
+    //MARK: - sacb
+    /**
+     scan 操作符是 Combine 框架中一个非常强大的转换操作符，它类似于 Swift 标准库中的 reduce 函数，但有一个重要区别：scan 会在每次接收到新值时立即发出累积结果，而 reduce 只会在发布者完成时发出最终结果。
+     
+     核心特性
+     1. 实时累积
+     每次接收到新值都会立即计算并发出当前累积结果
+
+     提供实时的转换和聚合功能
+
+     2. 状态保持
+     维护一个累积状态（accumulator）
+
+     每个新值都会与当前状态结合产生新状态
+
+     3. 类型转换
+     可以将输入类型转换为不同的输出类型
+     */
+    
+    func sacnSample1() {
+        let numbers = [1,2,3,4,5]
+        let cancellable = numbers.publisher
+            .scan(0) { accumulated, current in
+                return accumulated+current
+            }
+            .sink { value in
+                print("当前累计值:\(value)")
+            }
+        // 输出:
+        // 当前累积值: 1
+        // 当前累积值: 3
+        // 当前累积值: 6
+        // 当前累积值: 10
+        // 当前累积值: 15
+    }
 }
