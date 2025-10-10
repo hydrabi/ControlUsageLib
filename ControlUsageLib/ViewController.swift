@@ -71,16 +71,19 @@ class ViewController: UIViewController {
 
     var combind:CombindLearn? = nil
     
+    var fetch:FetchDemo? = nil
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         
         // Do any additional setup after loading the view.
 
-        combind = CombindLearn()
-        combind?.collectSample3()
+//        combind = CombindLearn()
+//        combind?.collectSample3()
         
-       
+        fetch = FetchDemo()
+        fetch?.startFetchAllData()
     }
 
 
