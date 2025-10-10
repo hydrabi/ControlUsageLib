@@ -262,15 +262,15 @@ class CombinePaginationFetcher<T: Codable> {
 //                .eraseToAnyPublisher()
 //        }
 //        else {
-            return fetchHandler(request)
-            //当上游发布者发出错误时 retry 会重新订阅并重新启动发布者
-                .retry(config.retryAttempts)
-//                .catch { error -> AnyPublisher<PageResponse<T>, Error> in
-//                    print("重试请求 \(request.startIndex) 达到最大重试次数: \(error)")
-//                    return Fail(error: error)
-//                        .eraseToAnyPublisher()
-//                }
-                .eraseToAnyPublisher()
+        return fetchHandler(request)
+        //当上游发布者发出错误时 retry 会重新订阅并重新启动发布者
+            .retry(config.retryAttempts)
+            .catch { error -> AnyPublisher<PageResponse<T>, Error> in
+                print("重试请求 \(request.startIndex) 达到最大重试次数: \(error)")
+                return Fail(error: error)
+                    .eraseToAnyPublisher()
+            }
+            .eraseToAnyPublisher()
 //        }
     }
     
@@ -287,6 +287,23 @@ class CombinePaginationFetcher<T: Codable> {
                                              success: false))
 //            .mapError { error in
 //                DataFetchError.networkError(error)
+//            }
+            .eraseToAnyPublisher()
+    }
+    
+    func fetchFirstPage2() -> AnyPublisher<PageResponse<T>,Error> {
+        let firstRequest = PageRequest()
+        firstRequest.startIndex = 0
+        firstRequest.pageSize = 10
+        print("开始首次请求")
+        
+        return fetchHandler(firstRequest)
+        //当上游发布者发出错误时 retry 会重新订阅并重新启动发布者
+            .retry(3)
+//            .catch { error -> AnyPublisher<PageResponse<T>, Error> in
+//                print("重试请求 \(firstRequest.startIndex) 达到最大重试次数: \(error)")
+//                return Fail(error: error)
+//                    .eraseToAnyPublisher()
 //            }
             .eraseToAnyPublisher()
     }
@@ -439,14 +456,16 @@ class CombinePaginationFetcher<T: Codable> {
 //            })
 //            .eraseToAnyPublisher()
         
-        return fetchWithRetry(request: request)
-            .replaceError(with: errorReplaceResponse)
-            .handleEvents(receiveCompletion: { completion in
-                if case .failure(let error) = completion {
-                    print("分页\(shard.shardIndex)失败:\(error)")
-                }
-            })
-            .eraseToAnyPublisher()
+        return Deferred {
+            self.fetchWithRetry(request: request)
+                .replaceError(with: errorReplaceResponse)
+                .handleEvents(receiveCompletion: { completion in
+                    if case .failure(let error) = completion {
+                        print("分页\(shard.shardIndex)失败:\(error)")
+                    }
+                })
+        }
+        .eraseToAnyPublisher()
 
     }
     
@@ -476,27 +495,31 @@ class APIService {
     private var totalRecords = 100
     
     func fetchPage(_ request:PageRequest) -> AnyPublisher<PageResponse<SampleData>,Error> {
+        print("触发页码为\(request.startIndex)的任务")
         let delay = Double.random(in: 0.5...2.0)
-        return Future<PageResponse<SampleData>,Error> { promise in
-            DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
-                let randomValue = Double.random(in: 0...1)
-                if randomValue < 0.3 {
-                    print("页码:\(request.startIndex)模拟请求失败触发，随机数为\(randomValue)")
-                    promise(.failure(URLError(.networkConnectionLost)))
-                    return
+//        let delay = Double.random(in: 5...10)
+        return Deferred {
+            Future<PageResponse<SampleData>,Error> { promise in
+                DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
+                    let randomValue = Double.random(in: 0...1)
+                    if randomValue < 0.2 {
+                        print("页码:\(request.startIndex)模拟请求失败触发，随机数为\(randomValue)")
+                        promise(.failure(NSError(domain: "TestError", code: -1, userInfo: nil)))
+                        return
+                    }
+                    print("页码:\(request.startIndex)成功，随机数为\(randomValue)")
+                    let start = request.startIndex
+                    let end = min(start + request.pageSize, self.totalRecords)
+                    let data = (start..<end).map { index in
+                        SampleData(id: index, content: "Item \(index)")
+                    }
+                    let response = PageResponse(data: data,
+                                                total:self.totalRecords,
+                                                currentIndex: start,
+                                                remaining:self.totalRecords - end,
+                                                success: true)
+                    promise(.success(response))
                 }
-                print("页码:\(request.startIndex)成功，随机数为\(randomValue)")
-                let start = request.startIndex
-                let end = min(start + request.pageSize, self.totalRecords)
-                let data = (start..<end).map { index in
-                    SampleData(id: index, content: "Item \(index)")
-                }
-                let response = PageResponse(data: data,
-                                            total:self.totalRecords,
-                                            currentIndex: start,
-                                            remaining:self.totalRecords - end,
-                                            success: true)
-                promise(.success(response))
             }
         }
         .eraseToAnyPublisher()
@@ -550,6 +573,43 @@ class FetchDemo {
                 }
             } receiveValue: { data in
                 print("请求成功，共\(data.count)条数据")
+            }
+            .store(in: &cancelable)
+    }
+    
+    func startFetchFirstPage() {
+        let startTime = Date()
+        let publish = Deferred {
+            Future<PageResponse<SampleData>,Error> { promise in
+                
+                let randomValue = Double.random(in: 0...1)
+                print("随机数为\(randomValue)")
+                if randomValue < 1 {
+                    promise(.failure(NSError(domain: "TestError", code: -1, userInfo: nil)))
+                    return
+                }
+                let temp:[SampleData] = []
+                let response = PageResponse(data: temp,
+                                            total:0,
+                                            currentIndex: 0,
+                                            remaining:0,
+                                            success: true)
+                promise(.success(response))
+            }
+        }.eraseToAnyPublisher()
+        
+        publish.receive(on: DispatchQueue.main)
+            .retry(3)
+            .sink { completion in
+                let duration = Date().timeIntervalSince(startTime)
+                switch completion {
+                case .finished:
+                    print("请求完成，耗时\(duration)秒")
+                case .failure(let error):
+                    print("请求失败，原因:\(error.localizedDescription)")
+                }
+            } receiveValue: { data in
+                print("请求成功，\(data)")
             }
             .store(in: &cancelable)
     }

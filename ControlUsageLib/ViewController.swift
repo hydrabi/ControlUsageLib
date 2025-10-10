@@ -80,7 +80,7 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
 
 //        combind = CombindLearn()
-//        combind?.collectSample3()
+//        combind?.retrySample()
         
         fetch = FetchDemo()
         fetch?.startFetchAllData()
