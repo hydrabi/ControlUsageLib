@@ -80,6 +80,8 @@ class ViewController: UIViewController {
         combind = CombindLearn()
         combind?.scanSample2()
         
+        let codableSample = CodableSampble()
+        codableSample.decodeNilSample()
        
     }
 

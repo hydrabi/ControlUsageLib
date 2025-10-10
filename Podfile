@@ -17,7 +17,7 @@ target 'ControlUsageLib' do
   #XML解析
   pod 'SWXMLHash', '~> 7.0.0'
   #ORM数据库
-  pod 'WCDB.swift'
+#  pod 'WCDB.swift'
   #JSON序列化，反序列化
   pod 'HandyJSON', '~> 5.0.2'
   #压缩、解压文件

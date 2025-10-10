@@ -30,6 +30,7 @@
 		02CC443C2BDF733800C500CE /* CodeiumTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02CC443B2BDF733800C500CE /* CodeiumTest.swift */; };
 		02CCD8792B899799002A442E /* ObservableSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02CCD8782B899799002A442E /* ObservableSample.swift */; };
 		02CF42CE2B48FB7000F5532C /* AvoidcrashTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 02CF42CD2B48FB7000F5532C /* AvoidcrashTest.m */; };
+		02D36BF22E7F9A0A00535E6F /* CodableSampble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D36BF12E7F9A0A00535E6F /* CodableSampble.swift */; };
 		02D395C32B4A4EDC006EBA8C /* String+Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D395C22B4A4EDC006EBA8C /* String+Operation.swift */; };
 		02DC559B2DBA697400B55214 /* CombindLearn+Publisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02DC559A2DBA697400B55214 /* CombindLearn+Publisher.swift */; };
 		02E314352C21858F00000B8E /* CombindLearn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E314342C21858F00000B8E /* CombindLearn.swift */; };
@@ -56,7 +57,6 @@
 		029CF7072B39B76800153685 /* UILable+AttributeText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILable+AttributeText.swift"; sourceTree = "<group>"; };
 		029CF70A2B39BEA600153685 /* GenericsSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericsSample.swift; sourceTree = "<group>"; };
 		029CF70D2B39C2BB00153685 /* CollectionSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionSample.swift; sourceTree = "<group>"; };
-		02A074662E5CA357005E95C3 /* Generic.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Generic.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		02B9B3512BD67DFB006FBFDC /* PromiseLearn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseLearn.swift; sourceTree = "<group>"; };
 		02BE7F552BC56BF400013433 /* description.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = description.xml; sourceTree = "<group>"; };
 		02BE7F592BC56C6000013433 /* SWXMLHashUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SWXMLHashUsage.swift; sourceTree = "<group>"; };
@@ -68,6 +68,7 @@
 		02CF42CB2B48FB6F00F5532C /* ControlUsageLib-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ControlUsageLib-Bridging-Header.h"; sourceTree = "<group>"; };
 		02CF42CC2B48FB7000F5532C /* AvoidcrashTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AvoidcrashTest.h; sourceTree = "<group>"; };
 		02CF42CD2B48FB7000F5532C /* AvoidcrashTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AvoidcrashTest.m; sourceTree = "<group>"; };
+		02D36BF12E7F9A0A00535E6F /* CodableSampble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableSampble.swift; sourceTree = "<group>"; };
 		02D395C22B4A4EDC006EBA8C /* String+Operation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Operation.swift"; sourceTree = "<group>"; };
 		02DC559A2DBA697400B55214 /* CombindLearn+Publisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CombindLearn+Publisher.swift"; sourceTree = "<group>"; };
 		02E314342C21858F00000B8E /* CombindLearn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombindLearn.swift; sourceTree = "<group>"; };
@@ -112,7 +113,7 @@
 		026E4D802B2E99BF00A0858D /* ControlUsageLib */ = {
 			isa = PBXGroup;
 			children = (
-				02A074652E5CA331005E95C3 /* Generic */,
+				02D36BF02E7F956200535E6F /* Codable */,
 				02E314332C21858000000B8E /* Combine */,
 				02747ECA2BC7906400D74A35 /* ThirdParty */,
 				02BE7F542BC56BE100013433 /* Resource */,
@@ -204,14 +205,6 @@
 			path = Collection;
 			sourceTree = "<group>";
 		};
-		02A074652E5CA331005E95C3 /* Generic */ = {
-			isa = PBXGroup;
-			children = (
-				02A074662E5CA357005E95C3 /* Generic.playground */,
-			);
-			path = Generic;
-			sourceTree = "<group>";
-		};
 		02B9B3502BD67DE9006FBFDC /* Promise */ = {
 			isa = PBXGroup;
 			children = (
@@ -271,6 +264,14 @@
 				02CCD8782B899799002A442E /* ObservableSample.swift */,
 			);
 			path = Observable;
+			sourceTree = "<group>";
+		};
+		02D36BF02E7F956200535E6F /* Codable */ = {
+			isa = PBXGroup;
+			children = (
+				02D36BF12E7F9A0A00535E6F /* CodableSampble.swift */,
+			);
+			path = Codable;
 			sourceTree = "<group>";
 		};
 		02D395C12B4A4E9E006EBA8C /* String */ = {
@@ -435,13 +436,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ControlUsageLib/Pods-ControlUsageLib-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ControlUsageLib/Pods-ControlUsageLib-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -466,6 +463,7 @@
 				02CBB24A2BD0C9550004EFDC /* FixtureType+Common.swift in Sources */,
 				02747ED32BC7E66A00D74A35 /* XMLImportViewController.swift in Sources */,
 				02CCD8792B899799002A442E /* ObservableSample.swift in Sources */,
+				02D36BF22E7F9A0A00535E6F /* CodableSampble.swift in Sources */,
 				02E314382C218E9000000B8E /* WhereSample.swift in Sources */,
 				02BE7F5A2BC56C6000013433 /* SWXMLHashUsage.swift in Sources */,
 				029CF70B2B39BEA600153685 /* GenericsSample.swift in Sources */,
