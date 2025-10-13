@@ -674,4 +674,49 @@ extension CombindLearn {
         // 当前累积值: 10
         // 当前累积值: 15
     }
+    
+    func retrySample() {
+        // 模拟可能失败的操作
+        var attemptCount = 0
+
+        func failingOperation() -> AnyPublisher<String, Error> {
+            return Deferred {
+                Future<String, Error> { promise in
+                    attemptCount += 1
+                    print("尝试第 \(attemptCount) 次")
+                    
+                    if attemptCount < 3 {
+                        promise(.failure(NSError(domain: "TestError", code: -1, userInfo: nil)))
+                    } else {
+                        promise(.success("操作成功！"))
+                    }
+                }
+            }
+            .eraseToAnyPublisher()
+        }
+
+        // 使用 retry 操作符
+        let cancellable = failingOperation()
+            .retry(2) // 重试2次（总共最多尝试3次）
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        print("操作成功完成")
+                    case .failure(let error):
+                        print("最终失败: \(error)")
+                    }
+                },
+                receiveValue: { value in
+                    print("接收到的值: \(value)")
+                }
+            )
+
+        // 输出:
+        // 尝试第 1 次
+        // 尝试第 2 次
+        // 尝试第 3 次
+        // 接收到的值: 操作成功！
+        // 操作成功完成
+    }
 }

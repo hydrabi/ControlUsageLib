@@ -58,7 +58,6 @@
 		029CF7072B39B76800153685 /* UILable+AttributeText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILable+AttributeText.swift"; sourceTree = "<group>"; };
 		029CF70A2B39BEA600153685 /* GenericsSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericsSample.swift; sourceTree = "<group>"; };
 		029CF70D2B39C2BB00153685 /* CollectionSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionSample.swift; sourceTree = "<group>"; };
-		02A074662E5CA357005E95C3 /* Generic.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Generic.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		02B9B3512BD67DFB006FBFDC /* PromiseLearn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseLearn.swift; sourceTree = "<group>"; };
 		02BE7F552BC56BF400013433 /* description.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = description.xml; sourceTree = "<group>"; };
 		02BE7F592BC56C6000013433 /* SWXMLHashUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SWXMLHashUsage.swift; sourceTree = "<group>"; };
@@ -123,7 +122,6 @@
 			isa = PBXGroup;
 			children = (
 				025A39392E97B09C00D0D135 /* PagetConcurrencyRequest */,
-				02A074652E5CA331005E95C3 /* Generic */,
 				02E314332C21858000000B8E /* Combine */,
 				02747ECA2BC7906400D74A35 /* ThirdParty */,
 				02BE7F542BC56BE100013433 /* Resource */,
@@ -213,14 +211,6 @@
 				02E314372C218E9000000B8E /* WhereSample.swift */,
 			);
 			path = Collection;
-			sourceTree = "<group>";
-		};
-		02A074652E5CA331005E95C3 /* Generic */ = {
-			isa = PBXGroup;
-			children = (
-				02A074662E5CA357005E95C3 /* Generic.playground */,
-			);
-			path = Generic;
 			sourceTree = "<group>";
 		};
 		02B9B3502BD67DE9006FBFDC /* Promise */ = {
