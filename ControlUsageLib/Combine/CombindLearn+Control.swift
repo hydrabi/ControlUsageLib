@@ -102,6 +102,68 @@ extension CombindLearn {
         subject.send(completion: .failure(MyError()))
     }
     
+    func scanSample5() {
+        let numbers = [1,2,3,4,5]
+        let cancellable = numbers.publisher
+            .scan(0) { accumulated, current in
+                return accumulated+current
+            }
+            .sink { value in
+                print("当前累计值:\(value)")
+            }
+        // 输出:
+        // 当前累积值: 1
+        // 当前累积值: 3
+        // 当前累积值: 6
+        // 当前累积值: 10
+        // 当前累积值: 15
+    }
+    
+    func scanSample6() {
+        // 模拟可能失败的操作
+        var attemptCount = 0
+
+        func failingOperation() -> AnyPublisher<String, Error> {
+            return Deferred {
+                Future<String, Error> { promise in
+                    attemptCount += 1
+                    print("尝试第 \(attemptCount) 次")
+                    
+                    if attemptCount < 3 {
+                        promise(.failure(NSError(domain: "TestError", code: -1, userInfo: nil)))
+                    } else {
+                        promise(.success("操作成功！"))
+                    }
+                }
+            }
+            .eraseToAnyPublisher()
+        }
+
+        // 使用 retry 操作符
+        let cancellable = failingOperation()
+            .retry(2) // 重试2次（总共最多尝试3次）
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        print("操作成功完成")
+                    case .failure(let error):
+                        print("最终失败: \(error)")
+                    }
+                },
+                receiveValue: { value in
+                    print("接收到的值: \(value)")
+                }
+            )
+
+        // 输出:
+        // 尝试第 1 次
+        // 尝试第 2 次
+        // 尝试第 3 次
+        // 接收到的值: 操作成功！
+        // 操作成功完成
+    }
+    
     //MARK: - tryScan
     /**
      tryScan 是 Combine 框架中的一个错误处理操作符，它与 scan 类似，但允许累积函数抛出错误。当需要在进行累积计算时可能遇到错误情况时，tryScan 提供了错误处理的能力。
@@ -639,84 +701,310 @@ extension CombindLearn {
             .store(in: &cancelSet)
     }
     
-    //MARK: - sacb
+    //MARK: - Reduce
     /**
-     scan 操作符是 Combine 框架中一个非常强大的转换操作符，它类似于 Swift 标准库中的 reduce 函数，但有一个重要区别：scan 会在每次接收到新值时立即发出累积结果，而 reduce 只会在发布者完成时发出最终结果。
+     reduce 操作符是 Combine 框架中用于聚合数据的强大工具，它可以将序列中的所有值合并成一个单一的结果。类似于 Swift 标准库中的 reduce 函数，但在响应式编程中处理的是异步数据流。
      
      核心特性
-     1. 实时累积
-     每次接收到新值都会立即计算并发出当前累积结果
+     1. 聚合计算
+     将数据流中的所有值聚合成单个结果
 
-     提供实时的转换和聚合功能
+     只在发布者完成时发出最终结果
 
      2. 状态保持
      维护一个累积状态（accumulator）
 
      每个新值都会与当前状态结合产生新状态
 
-     3. 类型转换
-     可以将输入类型转换为不同的输出类型
+     3. 完成触发
+     只有当上游发布者完成时，才会发出最终结果
      */
     
-    func sacnSample1() {
-        let numbers = [1,2,3,4,5]
-        let cancellable = numbers.publisher
-            .scan(0) { accumulated, current in
-                return accumulated+current
+    // 输出: 总和: 15
+    func reduceSample1() {
+        let numbers = [1, 2, 3, 4, 5]
+        let cancelable = numbers.publisher
+            .reduce(0) { accumulated, current in
+                return accumulated + current
             }
-            .sink { value in
-                print("当前累计值:\(value)")
+            .sink { total in
+                print("总和: \(total)") // 只在所有值发出后输出一次
             }
-        // 输出:
-        // 当前累积值: 1
-        // 当前累积值: 3
-        // 当前累积值: 6
-        // 当前累积值: 10
-        // 当前累积值: 15
     }
     
-    func retrySample() {
-        // 模拟可能失败的操作
-        var attemptCount = 0
-
-        func failingOperation() -> AnyPublisher<String, Error> {
-            return Deferred {
-                Future<String, Error> { promise in
-                    attemptCount += 1
-                    print("尝试第 \(attemptCount) 次")
-                    
-                    if attemptCount < 3 {
-                        promise(.failure(NSError(domain: "TestError", code: -1, userInfo: nil)))
-                    } else {
-                        promise(.success("操作成功！"))
-                    }
-                }
+    func reduceSample2() {
+        let words = ["Hello", "World", "!", "Combine", "Swift"]
+        let cancellable = words.publisher
+            .reduce("") { accumulated, current in
+                return accumulated + " " + current
             }
+            .sink { sentence in
+                print("完整句子：\(sentence)")
+            }
+    }
+    
+    //与 scan 操作符的区别
+    func reduceSample3() {
+        let numbers = [1, 2, 3, 4, 5]
+        numbers.publisher
+            .reduce(0, +)
+            .sink { value in
+                // 只输出一次: 15
+                print("reduce 结果:\(value)")
+            }
+        
+        numbers.publisher
+            .scan(0, +)
+            .sink { value in
+                // 输出: 1, 3, 6, 10, 15
+                print("scan 结果:\(value)")
+            }
+    }
+    
+    //MARK: - ignoreOutput
+    /**
+     ignoreOutput 操作符是 Combine 框架中一个实用的操作符，它会忽略所有输入的值，只关心发布者的完成事件（成功完成或失败）。当你不关心具体的值，只想知道操作是否完成时，这个操作符非常有用。
+     
+     核心特性
+     1. 值忽略
+     忽略所有从上游发布者接收到的值
+
+     不向下游传递任何值
+
+     2. 完成传递
+     只传递完成事件（.finished 或 .failure）
+
+     输出类型变为 Never
+
+     3. 类型转换
+     将 Publisher<Output, Failure> 转换为 Publisher<Never, Failure>
+     */
+    
+    func ignoreOutputSample1() {
+        // 输出: "数据流完成"
+        let numbers = [1, 2, 3, 4, 5].publisher
+        let _ = numbers
+            .ignoreOutput()
+            .sink { completion in
+                switch completion {
+                case .finished:
+                    print("完成")
+                case .failure(let error):
+                    print("错误")
+                }
+            } receiveValue: { _ in
+                print("不会接收到值")
+            }
+    }
+    
+    func ignoreOutputSample2() {
+        let complexPipeline = [1,2,3,4,5].publisher
+            .filter { $0 % 2 == 0 }
+            .map { $0 * 2 }
+//            .flatMap { value in
+//                return Just(value).delay(for: .second(1), scheduler: DispatchQueue.main)
+//            }
+            .collect()
+            .ignoreOutput()
             .eraseToAnyPublisher()
+        
+        
+        complexPipeline.sink { completion in
+            switch completion {
+            case .finished:
+                print("复杂处理完成")
+            case .failure:
+                print("处理失败")
+            }
+        } receiveValue: { _ in }
+
+    }
+    
+    //MARK: - MAX
+    /**
+     概述
+     max 操作符是 Combine 框架中用于查找序列中最大值的操作符。它会等待上游发布者完成，然后发出整个序列中的最大值。
+     
+     核心特性
+     1. 完成时发出结果
+     等待上游发布者完成
+
+     在完成时发出序列中的最大值
+
+     2. 比较方式
+     默认使用 < 操作符比较
+
+     支持自定义比较闭包
+
+     3. 空序列处理
+     如果序列为空，则完成时不发出任何值
+     
+     总结
+     max 操作符的主要特点：
+
+     等待完成：只有在源发布者完成时才会发出结果
+
+     比较支持：支持默认比较和自定义比较逻辑
+
+     类型安全：保持类型安全性，适用于各种可比类型
+
+     组合性强：可以与其他 Combine 操作符很好地组合使用
+
+     适用场景：
+
+     数据分析中的极值查找
+
+     实时监控系统中的峰值检测
+
+     游戏和评分系统中的最高分计算
+
+     任何需要找到序列中最大值的场景
+     */
+    
+    func maxSample1() {
+        let numbers = [5, 2, 8, 1, 9, 3].publisher
+        numbers
+            .max()
+            .sink { maxValue in
+                print("最大值: \(maxValue)") // 输出: 最大值: 9
+            }
+            .store(in: &cancelSet)
+    }
+    
+    func maxSample2() {
+        struct Person {
+            let name: String
+            let age: Int
         }
 
-        // 使用 retry 操作符
-        let cancellable = failingOperation()
-            .retry(2) // 重试2次（总共最多尝试3次）
-            .sink(
-                receiveCompletion: { completion in
-                    switch completion {
-                    case .finished:
-                        print("操作成功完成")
-                    case .failure(let error):
-                        print("最终失败: \(error)")
-                    }
-                },
-                receiveValue: { value in
-                    print("接收到的值: \(value)")
-                }
-            )
+        let people = [
+            Person(name: "Alice", age: 25),
+            Person(name: "Bob", age: 30),
+            Person(name: "Charlie", age: 28)
+        ].publisher
+        
+        people
+            .max { $0.age < $1.age }
+            .sink { oldestPerson in
+                print("最年长的人: \(oldestPerson.name), 年龄: \(oldestPerson.age)")
+                        // 输出: 最年长的人: Bob, 年龄: 30
+            }
+            .store(in: &cancelSet)
+    }
+    
+    //MARK: - count
+    /**
+     概述
+     count 操作符是 Combine 框架中用于统计发布者发出元素数量的操作符。它会等待上游发布者完成，然后发出元素的总数。
+     
+     核心特性
+     1. 完成时发出结果
+     等待上游发布者完成
 
-        // 输出:
-        // 尝试第 1 次
-        // 尝试第 2 次
-        // 尝试第 3 次
-        // 接收到的值: 操作成功！
-        // 操作成功完成
+     在完成时发出元素的总数量
+
+     2. 返回值
+     返回 Int 类型，表示元素数量
+
+     空序列返回 0
+
+     3. 错误传播
+     如果上游发布者失败，错误会传递给下游
+     */
+    
+    func countSample1() {
+        // 基础计数
+        let numbers = [1, 2, 3, 4, 5].publisher
+        numbers
+            .count()
+            .sink { count in
+                print("元素数量: \(count)") // 输出: 元素数量: 5
+            }
+            .store(in: &cancelSet)
+        
+        let emptyPublisher = Empty<Int,Never>()
+        emptyPublisher
+            .count()
+            .sink { count in
+                print("空序列数量: \(count)") // 输出: 空序列数量: 0
+            }
+            .store(in: &cancelSet)
+    }
+    
+    //MARK: - Min
+    /**
+     min 操作符是 Combine 框架中用于查找序列中最小值的操作符。它会等待上游发布者完成，然后发出整个序列中的最小值。
+     
+     核心特性
+     1. 完成时发出结果
+     等待上游发布者完成
+
+     在完成时发出序列中的最小值
+
+     2. 比较方式
+     默认使用 < 操作符比较
+
+     支持自定义比较闭包
+
+     3. 空序列处理
+     如果序列为空，则完成时不发出任何值
+     */
+    
+    func minSample1() {
+        let numbers = [5, 2, 8, 1, 9, 3].publisher
+        numbers
+            .min()
+            .sink { minValue in
+                print("最小值:\(minValue)") // 输出: 最小值: 1
+            }
+            .store(in: &cancelSet)
+    }
+    
+    func minSample2() {
+        struct Product {
+            let name: String
+            let price: Double
+            let rating: Int
+        }
+
+        let products = [
+            Product(name: "iPhone", price: 999.0, rating: 5),
+            Product(name: "iPad", price: 799.0, rating: 4),
+            Product(name: "MacBook", price: 1299.0, rating: 5),
+            Product(name: "AirPods", price: 199.0, rating: 4)
+        ].publisher
+        
+        products
+            .min { $0.price < $1.price }
+            .sink { cheapestProduct in
+                print("最便宜的产品:\(cheapestProduct.name), 价格: $\(cheapestProduct.price)")
+            }
+            .store(in: &cancelSet)
     }
 }
+
+extension Publisher where Output:Numeric {
+    func average() -> AnyPublisher<Double,Failure> {
+        return self.reduce((count:0,sum:0.0)) { result, value in
+            let doubleValue = Double("\(value)") ?? 0.0
+            return (result.count + 1, result.sum + doubleValue)
+        }
+        .map { Double($0.sum) / Double($0.count) }
+        .eraseToAnyPublisher()
+    }
+}
+
+extension Publisher where Output:Comparable {
+    func findMin() -> AnyPublisher<Output,Failure> {
+        return self.min().eraseToAnyPublisher()
+    }
+    
+    func findMin<T:Comparable>(by keyPath:KeyPath<Output,T>) -> AnyPublisher<Output,Failure> {
+        return self.min { $0[keyPath: keyPath] < $1[keyPath: keyPath]}
+            .eraseToAnyPublisher()
+    }
+}
+
+
+
+

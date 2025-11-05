@@ -35,6 +35,7 @@ final class PageRequest:requestProtocol {
     
     var updateTime: Int = 0
     
+    /// 其实页码从1开始
     var startIndex: Int = 0
     
     var pageSize: Int = 10
@@ -102,49 +103,38 @@ struct dataShard {
 
 // 进度信息
 struct FetchProgress {
+    
+    /// 总共请求的数量
     let processed: Int
+    /// 总数量
     let total: Int
+    /// 请求进度
     let percentage: Double
 }
 
 // 获取状态
 enum FetchStatus {
+    //闲置中
     case idle
+    //请求中
     case fetching
+    //请求完成
     case completed
+    //请求失败
     case failed(Error)
+    //请求取消
     case cancelled
-}
-
-// 错误类型
-enum DataFetchError: Error, LocalizedError {
-    case fetchInProgress
-    case networkError(Error)
-    case invalidResponse
-    case maxRetriesExceeded
-    case cancelled
-    
-    var errorDescription: String? {
-        switch self {
-        case .fetchInProgress:
-            return "已有正在进行的获取操作"
-        case .networkError(let error):
-            return "网络错误: \(error.localizedDescription)"
-        case .invalidResponse:
-            return "无效的响应数据"
-        case .maxRetriesExceeded:
-            return "已达到最大重试次数"
-        case .cancelled:
-            return "操作已取消"
-        }
-    }
 }
 
 class CombinePaginationFetcher<T: Codable> {
     typealias FetchHandler = (PageRequest) -> AnyPublisher<PageResponse<T>,Error>
     
     // MARK: - 属性
+    
+    /// 对请求的处理 处理完成后生成新的发布者
     private let fetchHandler: FetchHandler
+    
+    /// 请求属性的配置
     private let config: dataFetchConfig
     private let scheduler: DispatchQueue
     
@@ -154,13 +144,15 @@ class CombinePaginationFetcher<T: Codable> {
     private let progressSubject = PassthroughSubject<FetchProgress,Never>()
     //取消订阅
     private var cancellables = Set<AnyCancellable>()
-    private var shardPublishers:[AnyPublisher<PageResponse<T>,Error>] = []
     
     // 进度跟踪
     private var totalRecords = 0
     private var processedRecords = 0
     private var completedShards = 0
     private var totalShards = 0
+    
+    /// 已经请求成功的数据
+    var fetcheSuccessData:[T] = []
     
     var statusPublisher:AnyPublisher<FetchStatus,Never> {
         statusSubject.eraseToAnyPublisher()
@@ -201,7 +193,8 @@ class CombinePaginationFetcher<T: Codable> {
         processedRecords = 0
         completedShards = 0
         totalShards = 0
-        shardPublishers.removeAll()
+        //清空上次请求的数据
+        fetcheSuccessData.removeAll()
     }
     
     func updateProgress() {
@@ -212,7 +205,6 @@ class CombinePaginationFetcher<T: Codable> {
     func fetchAllData() -> AnyPublisher<[T],Never> {
         //请求中
         guard case .idle = statusSubject.value else {
-//            return Fail(error: DataFetchError.fetchInProgress).eraseToAnyPublisher()
             return Just([]).eraseToAnyPublisher()
         }
         
@@ -221,13 +213,23 @@ class CombinePaginationFetcher<T: Codable> {
         
         return Deferred {
             [weak self] in guard let strongSelf = self else { return Empty<[T],Never>().eraseToAnyPublisher() }
-            
+            //先请求第一页数据查看是否有新的剩余数据需要请求
             return strongSelf.fetchFirstPage()
                 .flatMap { firstPage -> AnyPublisher<[T],Never> in
                     strongSelf.totalRecords = firstPage.total
                     print("总数据量:\(strongSelf.totalRecords)")
-                    if strongSelf.totalRecords == 0 {
+                    //没有数据或者请求失败都不抛出错误 主要是为了部分请求错误仍然不影响其它请求的执行
+                    if strongSelf.totalRecords == 0  {
                         return Just([]).eraseToAnyPublisher()
+//                        return Just([]).setFailureType(to: Error.self).eraseToAnyPublisher()
+                    }
+                    else if !firstPage.success {
+                        print("获取第一页数据失败")
+                        return Just([]).eraseToAnyPublisher()
+                    }
+                    else {
+                        //请求成功则添加第一页的数据
+                        strongSelf.fetcheSuccessData.append(contentsOf: firstPage.data)
                     }
                     return strongSelf.fetchAllShards()
                 }
@@ -249,19 +251,19 @@ class CombinePaginationFetcher<T: Codable> {
     }
     
     func fetchWithRetry(request:PageRequest) -> AnyPublisher<PageResponse<T>,Error> {
-//        if #available(iOS 14.0, *) {
-//            return fetchHandler(request)
-//            //当上游发布者发出错误时 retry 会重新订阅并重新启动发布者
-//                .retryWithDelay(config.retryAttempts,
-//                                delay: config.retryDelay)
-////                .catch { error -> AnyPublisher<PageResponse<T>, Error> in
-////                    print("重试请求 \(request.startIndex) 达到最大重试次数: \(error)")
-////                    return Fail(error: error)
-////                        .eraseToAnyPublisher()
-////                }
-//                .eraseToAnyPublisher()
-//        }
-//        else {
+        if #available(iOS 14.0, *) {
+            return fetchHandler(request)
+            //当上游发布者发出错误时 retry 会重新订阅并重新启动发布者
+                .retryWithDelay(config.retryAttempts,
+                                delay: config.retryDelay)
+                .catch { error -> AnyPublisher<PageResponse<T>, Error> in
+                    print("重试请求 \(request.startIndex) 达到最大重试次数: \(error)")
+                    return Fail(error: error)
+                        .eraseToAnyPublisher()
+                }
+                .eraseToAnyPublisher()
+        }
+        else {
         return fetchHandler(request)
         //当上游发布者发出错误时 retry 会重新订阅并重新启动发布者
             .retry(config.retryAttempts)
@@ -271,99 +273,46 @@ class CombinePaginationFetcher<T: Codable> {
                     .eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
-//        }
+        }
     }
     
     func fetchFirstPage() -> AnyPublisher<PageResponse<T>,Never> {
         let firstRequest = PageRequest()
-        firstRequest.startIndex = 0
+        firstRequest.startIndex = 1
         firstRequest.pageSize = 10
         print("开始首次请求")
+        //请求失败不抛出错误
         return fetchWithRetry(request: firstRequest)
             .replaceError(with: PageResponse(data: [],
                                              total: 0,
                                              currentIndex: 0,
                                              remaining: 0,
                                              success: false))
-//            .mapError { error in
-//                DataFetchError.networkError(error)
-//            }
             .eraseToAnyPublisher()
     }
     
-    func fetchFirstPage2() -> AnyPublisher<PageResponse<T>,Error> {
-        let firstRequest = PageRequest()
-        firstRequest.startIndex = 0
-        firstRequest.pageSize = 10
-        print("开始首次请求")
-        
-        return fetchHandler(firstRequest)
-        //当上游发布者发出错误时 retry 会重新订阅并重新启动发布者
-            .retry(3)
-//            .catch { error -> AnyPublisher<PageResponse<T>, Error> in
-//                print("重试请求 \(firstRequest.startIndex) 达到最大重试次数: \(error)")
-//                return Fail(error: error)
-//                    .eraseToAnyPublisher()
-//            }
-            .eraseToAnyPublisher()
-    }
     
     //计算一共要下载多少页（需要减去第一页）
     func calculateShards(total:Int) -> [dataShard] {
         var shards:[dataShard] = []
-        //累计的数据请求数量
-        var currentIndex = 0
-        //累计的页码
-        var shardIndex = 0
+        //累计的数据请求数量（第一页已请求）
+        var currentNums = fetcheSuccessData.count
+        //累计的页码(页码从1开始,第一页已经请求，所以初始为2)
+        var shardIndex = 2
         
-        while currentIndex < total {
-            let actualSize = min(config.basePageSize, total - currentIndex)
-            let shard = dataShard(startIndex: currentIndex, pageSize: actualSize, shardIndex: shardIndex)
+        while currentNums < total {
+            //剩余的数据可能少于每页的条数
+            let actualSize = min(config.basePageSize, total - currentNums)
+            let shard = dataShard(startIndex: currentNums, pageSize: actualSize, shardIndex: shardIndex)
             shards.append(shard)
-            currentIndex += actualSize
+            currentNums += actualSize
             shardIndex += 1
         }
         return shards
     }
     
-    func fetchAllShards2() -> AnyPublisher<[T],Never> {
-        let shards = calculateShards(total: totalRecords)
-        totalShards = shards.count
-        print("共\(totalShards)页需要请求")
-        
-        let shardPublishers = shards.map { shard in
-            fetchShard(shard)
-        }
-        
-        //使用flatMap控制并发数目
-//        return Publishers.MergeMany(shardPublishers)
-//            .collect()
-//            .map { response in
-//                let allData = response.flatMap { $0.data }
-//                print("共\(allData.count)条数据")
-//                return allData
-//            }
-//            .mapError { error in
-//                DataFetchError.networkError(error)
-//            }
-//            .eraseToAnyPublisher()
-        //限制最大并发数为5个
-        return Publishers.Sequence(sequence: shardPublishers)
-            .flatMap(maxPublishers: .max(5)) { publisher in
-                publisher
-            }
-            .collect()
-            .map { response in
-                let allData = response.flatMap { $0.data }
-                print("请求完成，共\(allData.count)条数据")
-                return allData
-            }
-//            .mapError { error in
-//                DataFetchError.networkError(error)
-//            }
-            .eraseToAnyPublisher()
-    }
-    
+    /// 请求所有剩余页数
+    /// - Returns: 发布者
     func fetchAllShards() -> AnyPublisher<[T],Never> {
         let shards = calculateShards(total: totalRecords)
         totalShards = shards.count
@@ -381,7 +330,7 @@ class CombinePaginationFetcher<T: Codable> {
                 publisher
             }
             .scan(scanTemp, { accumulator, value in
-
+                
                 let newCompleted = accumulator.0 + 1
                 let newProcessed = accumulator.1 + value.data.count
                 let newResponses = accumulator.2 + [value]
@@ -392,7 +341,7 @@ class CombinePaginationFetcher<T: Codable> {
                     print("分页\(value.currentIndex)完成，进度\(newProcessed)")
                 }
                 else {
-                    print("分页\(value.currentIndex)失败")
+                    print("分页\(value.currentIndex)失败，记录失败页码")
                 }
                 
                 //进度更新
@@ -404,13 +353,13 @@ class CombinePaginationFetcher<T: Codable> {
                 }
                 return (newCompleted, newProcessed, newResponses)
             })
-        //只取最后一个累计值
+            //只取最后一个累计值
             .last()
-        //只取响应数据
+            //只取响应数据
             .map{$0.2}
             .map { response in
                 let allData = response.flatMap { $0.data }
-                print("请求完成，共\(allData.count)条数据")
+                print("请求完成，除第一页剩余共\(allData.count)条数据")
                 return allData
             }
             .eraseToAnyPublisher()
@@ -429,33 +378,7 @@ class CombinePaginationFetcher<T: Codable> {
                                     currentIndex: request.startIndex,
                                     remaining: self.totalRecords - request.startIndex,
                                     success: false)
-        
-//        return fetchWithRetry(request: request)
-//            .replaceError(with: errorReplaceResponse)
-//            .handleEvents(receiveOutput: {
-//                [weak self] response in guard let strongSelf = self else { return }
-//                if response.success {
-//                    DispatchQueue.main.async {
-//                        strongSelf.processedRecords += response.data.count
-//                        strongSelf.completedShards += 1
-//                        let progress = strongSelf.getCurrentProgress()
-//                        print("分页\(shard.shardIndex)完成，进度\(progress.processed)")
-//                        strongSelf.progressSubject.send(progress)
-//                    }
-//                }
-//                else {
-//                    print("分页\(shard.shardIndex)失败")
-//                }
-//                
-//            },
-//                          receiveCompletion: {
-//                completion in
-//                if case .failure(let error) = completion {
-//                    print("分页\(shard.shardIndex)失败:\(error)")
-//                }
-//            })
-//            .eraseToAnyPublisher()
-        
+
         return Deferred {
             self.fetchWithRetry(request: request)
                 .replaceError(with: errorReplaceResponse)
@@ -473,7 +396,6 @@ class CombinePaginationFetcher<T: Codable> {
         //取消所有订阅
         cancellables.forEach { $0.cancel() }
         cancellables.removeAll()
-        shardPublishers.removeAll()
         
         if case .fetching = statusSubject.value {
             statusSubject.send(.cancelled)

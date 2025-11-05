@@ -65,7 +65,9 @@ func RGBA(r: UInt, g: UInt, b: UInt, a: CGFloat) -> UIColor {
     return color
 }
 
-
+class temp {
+    var ary = [1,2]
+}
 
 class ViewController: UIViewController {
 
@@ -84,6 +86,7 @@ class ViewController: UIViewController {
         
         fetch = FetchDemo()
         fetch?.startFetchAllData()
+        
     }
 
 
