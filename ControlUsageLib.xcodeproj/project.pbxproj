@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0223E3F72EC60861009A9843 /* CustomPinchCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0223E3F62EC60861009A9843 /* CustomPinchCollectionView.swift */; };
 		023AE7C22E32605800A92421 /* CombindLearn+Control.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023AE7C12E32605800A92421 /* CombindLearn+Control.swift */; };
 		02584FA22C26CBF600756A42 /* GithubAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02584FA12C26CBF600756A42 /* GithubAPI.swift */; };
 		025A393B2E97B10400D0D135 /* PagetConcurrencyRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 025A393A2E97B10400D0D135 /* PagetConcurrencyRequest.swift */; };
@@ -41,6 +42,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0223E3F62EC60861009A9843 /* CustomPinchCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPinchCollectionView.swift; sourceTree = "<group>"; };
 		023AE7C12E32605800A92421 /* CombindLearn+Control.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CombindLearn+Control.swift"; sourceTree = "<group>"; };
 		02584FA12C26CBF600756A42 /* GithubAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubAPI.swift; sourceTree = "<group>"; };
 		025A393A2E97B10400D0D135 /* PagetConcurrencyRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagetConcurrencyRequest.swift; sourceTree = "<group>"; };
@@ -92,6 +94,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0223E3F52EC6083B009A9843 /* CustomCollectionView */ = {
+			isa = PBXGroup;
+			children = (
+				0223E3F62EC60861009A9843 /* CustomPinchCollectionView.swift */,
+			);
+			path = CustomCollectionView;
+			sourceTree = "<group>";
+		};
 		025A39392E97B09C00D0D135 /* PagetConcurrencyRequest */ = {
 			isa = PBXGroup;
 			children = (
@@ -121,6 +131,7 @@
 		026E4D802B2E99BF00A0858D /* ControlUsageLib */ = {
 			isa = PBXGroup;
 			children = (
+				0223E3F52EC6083B009A9843 /* CustomCollectionView */,
 				025A39392E97B09C00D0D135 /* PagetConcurrencyRequest */,
 				02E314332C21858000000B8E /* Combine */,
 				02747ECA2BC7906400D74A35 /* ThirdParty */,
@@ -465,6 +476,7 @@
 				02CBB24C2BD120830004EFDC /* FixtureType+Transform.swift in Sources */,
 				02DC559B2DBA697400B55214 /* CombindLearn+Publisher.swift in Sources */,
 				02CBB24A2BD0C9550004EFDC /* FixtureType+Common.swift in Sources */,
+				0223E3F72EC60861009A9843 /* CustomPinchCollectionView.swift in Sources */,
 				02747ED32BC7E66A00D74A35 /* XMLImportViewController.swift in Sources */,
 				02CCD8792B899799002A442E /* ObservableSample.swift in Sources */,
 				02E314382C218E9000000B8E /* WhereSample.swift in Sources */,

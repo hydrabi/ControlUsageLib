@@ -19,7 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let tempWindow = UIWindow(windowScene: windowScene)
         self.window = tempWindow
-        self.window?.rootViewController = UINavigationController(rootViewController: ViewController()) 
+        self.window?.rootViewController = UINavigationController(rootViewController: CustomPinchCollectionViewController()) 
 //        self.window?.rootViewController = UINavigationController(rootViewController: XMLImportViewController()) 
         tempWindow.makeKeyAndVisible()
     }

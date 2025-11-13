@@ -115,5 +115,13 @@
             </PersistentString>
          </PersistentStrings>
       </ContextState>
+      <ContextState
+         contextName = "AdvancedCollectionView.handlePinch(_:):CustomPinchCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "currentScale">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
    </ContextStates>
 </VariablesViewState>
