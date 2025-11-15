@@ -103,16 +103,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "8250341C-5B5C-45DC-B048-0A98EA30F32F"
+            uuid = "4926935B-5E48-4845-9534-56F322E1897D"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ControlUsageLib/CustomCollectionView/CustomPinchCollectionView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "149"
-            endingLineNumber = "149"
-            landmarkName = "handlePinch(_:)"
+            startingLineNumber = "38"
+            endingLineNumber = "38"
+            landmarkName = "draw(in:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

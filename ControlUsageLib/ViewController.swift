@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import SnapKit
 
 extension String {
     /// 计算文本长度
@@ -75,6 +75,10 @@ class ViewController: UIViewController {
     
     var fetch:FetchDemo? = nil
     
+    lazy var gridView:GridView = {
+        return GridView(frame: .zero)
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -87,6 +91,10 @@ class ViewController: UIViewController {
         fetch = FetchDemo()
         fetch?.startFetchAllData()
         
+        view.addSubview(gridView)
+        gridView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
 
 
