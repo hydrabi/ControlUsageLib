@@ -1,335 +1,296 @@
 import UIKit
-import CoreText
 
-// MARK: - GridLayer: 负责绘制网格（可见区域优化）
-class GridLayer: CALayer {
-    // 数据源：格子数量
-    var itemCount: Int = 1000 { didSet { setNeedsDisplay() } }
-    // 单元格大小（逻辑像素）
-    var cellSize: CGFloat = 80 { didSet { setNeedsDisplay() } }
-    // 内容偏移（用于平移）
-    var contentOffset: CGPoint = .zero { didSet { setNeedsDisplay() } }
-    // 行列数推导（不强制）
-    var columns: Int { max(1, Int(bounds.width / cellSize) + 2) }
-    // 用来高亮拖拽中项
-    var draggingIndex: Int? { didSet { setNeedsDisplay() } }
-    // 拖拽浮层位置（屏幕坐标）
-    var dragPosition: CGPoint? { didSet { setNeedsDisplay() } }
-    // 文字属性缓存
-    private var font: CTFont = CTFontCreateWithName("Helvetica" as CFString, 14, nil)
-
-    override init() {
-        super.init()
-        contentsScale = UIScreen.main.scale
-        isOpaque = true
-        needsDisplayOnBoundsChange = true
-        setNeedsDisplay()
+class GridView: UIView {
+    var numberOfRows: Int = 0
+    var numberOfColumns: Int = 0
+    var gridSize: CGSize = .zero
+    
+    // 存储方格数据的数组
+    var gridData: [[UIColor]] = []
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = .white
     }
-
-    override init(layer: Any) {
-        super.init(layer: layer)
-    }
-
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        backgroundColor = .white
     }
-
-    override func draw(in ctx: CGContext) {
-        guard itemCount > 0 else { return }
-        UIGraphicsPushContext(ctx)
-        ctx.saveGState()
-
-        // clear
-        ctx.setFillColor(UIColor.systemBackground.cgColor)
-        ctx.fill(bounds)
-
-        // apply contentOffset (world -> view)
-        ctx.translateBy(x: -contentOffset.x, y: -contentOffset.y)
-
-        // compute visible rect in world coords
-        let visibleRect = CGRect(origin: contentOffset, size: bounds.size)
-
-        // compute visible rows/cols (with padding)
-        let minCol = max(0, Int(floor(visibleRect.minX / cellSize)) - 1)
-        let maxCol = Int(ceil(visibleRect.maxX / cellSize)) + 1
-        let minRow = max(0, Int(floor(visibleRect.minY / cellSize)) - 1)
-        let maxRow = Int(ceil(visibleRect.maxY / cellSize)) + 1
-
-        // grid line style
-        ctx.setLineWidth(1.0 / contentsScale)
-        ctx.setStrokeColor(UIColor.secondaryLabel.cgColor)
-
-        // draw vertical lines
-        var x = CGFloat(minCol) * cellSize
-        if minCol <= maxCol {
-            for col in minCol...maxCol {
-                ctx.move(to: CGPoint(x: x, y: CGFloat(minRow) * cellSize))
-                ctx.addLine(to: CGPoint(x: x, y: CGFloat(maxRow) * cellSize))
-                x += cellSize
-            }
-        }
+    
+    // 配置网格
+    func configureGrid(rows: Int, columns: Int, totalSize: CGSize) {
+        self.numberOfRows = rows
+        self.numberOfColumns = columns
         
-        // draw horizontal lines
-        var y = CGFloat(minRow) * cellSize
-        if minRow <= maxRow {
-            for row in minRow...maxRow {
-                ctx.move(to: CGPoint(x: CGFloat(minCol) * cellSize, y: y))
-                ctx.addLine(to: CGPoint(x: CGFloat(maxCol) * cellSize, y: y))
-                y += cellSize
-            }
-            ctx.strokePath()
-        }
+        // 计算每个方格的大小
+        let cellWidth = totalSize.width / CGFloat(columns)
+        let cellHeight = totalSize.height / CGFloat(rows)
+        self.gridSize = CGSize(width: cellWidth, height: cellHeight)
         
-
-        // draw items (only visible ones)
-        let colsPerRow = max(1, columns)
-        for row in minRow...maxRow {
-            for col in minCol...maxCol {
-                let idx = row * colsPerRow + col
-                if idx < 0 || idx >= itemCount { continue }
-                let cellRect = CGRect(x: CGFloat(col) * cellSize,
-                                      y: CGFloat(row) * cellSize,
-                                      width: cellSize,
-                                      height: cellSize)
-                // cell background for dragging highlight
-                if let dragIdx = draggingIndex, dragIdx == idx {
-                    // skip drawing underlying if dragging (we'll draw floating representation elsewhere)
-                    ctx.setFillColor(UIColor.systemGray4.cgColor)
-                    ctx.fill(cellRect.insetBy(dx: 2, dy: 2))
-                }
-
-                // draw index text centered
-                let text = "\(idx)"
-                drawCentered(text: text, in: cellRect, ctx: ctx)
-            }
-        }
-
-        // draw floating drag snapshot if exists
-        if let dragIndex = draggingIndex, let dragPos = dragPosition, dragIndex < itemCount {
-            // draw a floating rounded rect with index
-            ctx.restoreGState() // go to screen coords
-            let size = CGSize(width: cellSize * 0.95, height: cellSize * 0.95)
-            let r = CGRect(origin: CGPoint(x: dragPos.x - size.width/2, y: dragPos.y - size.height/2), size: size)
-            ctx.saveGState()
-            let path = UIBezierPath(roundedRect: r, cornerRadius: 8)
-            ctx.setFillColor(UIColor.systemBlue.withAlphaComponent(0.95).cgColor)
-            ctx.addPath(path.cgPath)
-            ctx.fillPath()
-            // text
-            ctx.translateBy(x: 0, y: 0)
-            drawCentered(text: "\(dragIndex)", in: r, ctx: ctx, color: UIColor.white)
-        }
-
-        ctx.restoreGState()
-        UIGraphicsPopContext()
+        // 设置视图的frame
+        self.frame = CGRect(origin: .zero, size: totalSize)
+        
+        // 生成随机颜色数据用于演示
+        generateRandomGridData()
+        
+        // 标记需要重绘
+        setNeedsDisplay()
     }
-
-    private func drawCentered(text: String, in rect: CGRect, ctx: CGContext, color: UIColor = .label) {
-        // use CoreText quick draw
-        let attr: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: min(16, rect.width * 0.2)),
-            .foregroundColor: color
+    
+    // 生成随机的网格颜色数据
+    private func generateRandomGridData() {
+        gridData = []
+        let colors: [UIColor] = [.systemBlue, .systemGreen, .systemOrange, .systemPurple, .systemTeal]
+        
+        for _ in 0..<numberOfRows {
+            var row: [UIColor] = []
+            for _ in 0..<numberOfColumns {
+                let randomColor = colors.randomElement() ?? .systemGray
+                row.append(randomColor)
+            }
+            gridData.append(row)
+        }
+    }
+    
+    override func draw(_ rect: CGRect) {
+        guard let context = UIGraphicsGetCurrentContext() else { return }
+        
+        // 绘制所有方格
+        for row in 0..<numberOfRows {
+            for column in 0..<numberOfColumns {
+                drawGridCell(context: context, row: row, column: column)
+            }
+        }
+    }
+    
+    // 绘制单个方格
+    private func drawGridCell(context: CGContext, row: Int, column: Int) {
+        let x = CGFloat(column) * gridSize.width
+        let y = CGFloat(row) * gridSize.height
+        
+        let cellRect = CGRect(x: x, y: y, width: gridSize.width, height: gridSize.height)
+        
+        // 设置方格颜色
+        let color = gridData[row][column]
+        context.setFillColor(color.cgColor)
+        context.setStrokeColor(UIColor.black.cgColor)
+        context.setLineWidth(0.5)
+        
+        // 绘制方格填充和边框
+        context.fill(cellRect)
+        context.stroke(cellRect)
+        
+        // 绘制序号
+        drawGridNumber(context: context, rect: cellRect, number: row * numberOfColumns + column + 1)
+    }
+    
+    // 绘制方格序号
+    private func drawGridNumber(context: CGContext, rect: CGRect, number: Int) {
+        let numberString = "\(number)" as NSString
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 4, weight: .medium),
+            .foregroundColor: UIColor.white
         ]
-        let attrStr = NSAttributedString(string: text, attributes: attr)
-        let line = CTLineCreateWithAttributedString(attrStr as CFAttributedString)
-        ctx.saveGState()
-        ctx.translateBy(x: rect.midX, y: rect.midY)
-        // CoreText draws text baseline at (0,0), so move down by half ascent-descent:
-        let runs = CTLineGetGlyphRuns(line) as? [CTRun]
-        // Simple: use CTLineGetTypographicBounds to center vertically
-        var ascent: CGFloat = 0, descent: CGFloat = 0, leading: CGFloat = 0
-        let width = CTLineGetTypographicBounds(line, &ascent, &descent, &leading)
-        ctx.translateBy(x: -CGFloat(width)/2.0, y: -CGFloat((ascent - descent)/2.0))
-        ctx.setTextDrawingMode(.fill)
-        ctx.setFillColor(color.cgColor)
-        CTLineDraw(line, ctx)
-        ctx.restoreGState()
+        
+        let textSize = numberString.size(withAttributes: attributes)
+        let textRect = CGRect(
+            x: rect.midX - textSize.width / 2,
+            y: rect.midY - textSize.height / 2,
+            width: textSize.width,
+            height: textSize.height
+        )
+        
+        numberString.draw(in: textRect, withAttributes: attributes)
     }
 }
 
-// MARK: - GridView: 封装手势、CADisplayLink、拖拽逻辑
-class GridView: UIView {
-    private let gridLayer = GridLayer()
-    private var displayLink: CADisplayLink?
-
-    // model
-    private(set) var itemCount: Int = 1000 {
-        didSet { gridLayer.itemCount = itemCount }
+class GridViewController: UIViewController {
+    
+    var scrollView: UIScrollView!
+    var gridView: GridView!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI()
+        setupGrid()
     }
-
-    // state
-    private var cellSize: CGFloat = 80 {
-        didSet {
-            gridLayer.cellSize = cellSize
+    
+    private func setupUI() {
+        view.backgroundColor = .white
+        
+        // 创建 UIScrollView
+        scrollView = UIScrollView(frame: view.bounds)
+        scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        scrollView.delegate = self
+        
+        // 设置缩放参数
+        scrollView.minimumZoomScale = 0.5
+        scrollView.maximumZoomScale = 10.0
+        scrollView.zoomScale = 1.0
+        
+        view.addSubview(scrollView)
+        
+        // 添加双击手势
+        setupDoubleTapGesture()
+    }
+    
+    private func setupGrid() {
+        // 配置 40x25 = 1000 个方格
+        let rows = 100
+        let columns = 100
+        
+        // 计算总尺寸 (每个方格 40x40)
+        let totalWidth = CGFloat(columns) * 10
+        let totalHeight = CGFloat(rows) * 10
+        
+        // 创建网格视图
+        gridView = GridView()
+        gridView.configureGrid(rows: rows, columns: columns, totalSize: CGSize(width: totalWidth, height: totalHeight))
+        
+        // 添加到 scrollView
+        scrollView.addSubview(gridView)
+        
+        // 设置 contentSize
+        scrollView.contentSize = CGSize(width: totalWidth, height: totalHeight)
+        
+        // 初始居中显示
+        centerGridView()
+    }
+    
+    // 设置双击手势
+    private func setupDoubleTapGesture() {
+        let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
+        doubleTapRecognizer.numberOfTapsRequired = 2
+        scrollView.addGestureRecognizer(doubleTapRecognizer)
+    }
+    
+    @objc private func handleDoubleTap(_ recognizer: UITapGestureRecognizer) {
+        if scrollView.zoomScale > scrollView.minimumZoomScale {
+            // 如果已放大，则缩小
+            scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
+        } else {
+            // 如果已缩小，则放大到中等比例
+            scrollView.setZoomScale(2.0, animated: true)
         }
     }
-    private var contentOffset: CGPoint = .zero {
-        didSet {
-            gridLayer.contentOffset = contentOffset
+    
+    // 居中显示网格
+    private func centerGridView() {
+        let boundsSize = scrollView.bounds.size
+        var contentFrame = gridView.frame
+        
+        // 水平居中
+        if contentFrame.size.width < boundsSize.width {
+            contentFrame.origin.x = (boundsSize.width - contentFrame.size.width) / 2.0
+        } else {
+            contentFrame.origin.x = 0.0
         }
-    }
-    private var velocity = CGPoint.zero // 用于动画（示例）
-
-    // gestures
-    private lazy var pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
-    private lazy var pan = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
-    private lazy var longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
-
-    // drag
-    private var draggingIndex: Int?
-    private var dragStartOffset: CGPoint = .zero
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        commonInit()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        commonInit()
-    }
-
-    private func commonInit() {
-        // layer setup
-        layer.addSublayer(gridLayer)
-        gridLayer.frame = bounds
-        gridLayer.contentsScale = UIScreen.main.scale
-        gridLayer.itemCount = itemCount
-        gridLayer.cellSize = cellSize
-
-        // gestures
-        addGestureRecognizer(pinch)
-        addGestureRecognizer(pan)
-        addGestureRecognizer(longPress)
-        pan.require(toFail: longPress) // long press takes precedence for dragging
-
-        // displayLink
-        displayLink = CADisplayLink(target: self, selector: #selector(tick(_:)))
-        displayLink?.add(to: .main, forMode: .common)
-    }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        gridLayer.frame = bounds
-        gridLayer.setNeedsDisplay()
-    }
-
-    deinit {
-        displayLink?.invalidate()
-    }
-
-    // MARK: - public helpers
-    func configure(itemCount: Int, initialCellSize: CGFloat = 80) {
-        self.itemCount = itemCount
-        self.cellSize = initialCellSize
-        gridLayer.cellSize = cellSize
-    }
-
-    // MARK: - tick (CADisplayLink)
-    @objc private func tick(_ link: CADisplayLink) {
-        // If there's an inertial velocity, apply friction (示例)
-        if velocity != .zero {
-            contentOffset.x += velocity.x / 60.0
-            contentOffset.y += velocity.y / 60.0
-            velocity.x *= 0.95
-            velocity.y *= 0.95
-            if abs(velocity.x) < 0.1 && abs(velocity.y) < 0.1 { velocity = .zero }
-            gridLayer.contentOffset = contentOffset
-            gridLayer.setNeedsDisplay()
+        
+        // 垂直居中
+        if contentFrame.size.height < boundsSize.height {
+            contentFrame.origin.y = (boundsSize.height - contentFrame.size.height) / 2.0
+        } else {
+            contentFrame.origin.y = 0.0
         }
+        
+        gridView.frame = contentFrame
     }
+}
 
-    // MARK: - gestures
-    @objc private func handlePinch(_ g: UIPinchGestureRecognizer) {
-        switch g.state {
-        case .began, .changed:
-            // 缩放时，保持手势中心位置在相同的世界坐标
-            let location = g.location(in: self)
-            let worldBefore = CGPoint(x: contentOffset.x + location.x, y: contentOffset.y + location.y)
-            let newSize = max(20, min(200, cellSize * g.scale))
-            cellSize = newSize
-            // adjust contentOffset so that worldBefore maps to same screen point
-            let worldAfter = worldBefore
-            contentOffset = CGPoint(x: worldAfter.x - location.x, y: worldAfter.y - location.y)
-            gridLayer.cellSize = cellSize
-            gridLayer.contentOffset = contentOffset
-            gridLayer.setNeedsDisplay()
-            g.scale = 1.0
-        default:
-            break
-        }
+// MARK: - UIScrollViewDelegate
+extension GridViewController: UIScrollViewDelegate {
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return gridView
     }
-
-    @objc private func handlePan(_ g: UIPanGestureRecognizer) {
-        if draggingIndex != nil {
-            // during dragging, we move dragPosition only
-            let p = g.location(in: self)
-            gridLayer.dragPosition = p
-            return
-        }
-        switch g.state {
-        case .began, .changed:
-            let t = g.translation(in: self)
-            contentOffset.x -= t.x
-            contentOffset.y -= t.y
-            gridLayer.contentOffset = contentOffset
-            gridLayer.setNeedsDisplay()
-            g.setTranslation(.zero, in: self)
-        case .ended:
-            velocity = g.velocity(in: self)
-        default:
-            break
-        }
+    
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        // 缩放时保持内容居中
+        centerGridView()
     }
+    
+    func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
+        // 缩放结束后可以在这里处理额外逻辑
+        print("当前缩放比例: \(scale)")
+    }
+}
 
-    @objc private func handleLongPress(_ g: UILongPressGestureRecognizer) {
-        let loc = g.location(in: self)
-        // map to world coords
-        let world = CGPoint(x: contentOffset.x + loc.x, y: contentOffset.y + loc.y)
-        let col = Int(floor(world.x / cellSize))
-        let row = Int(floor(world.y / cellSize))
-        let index = row * max(1, Int(bounds.width / cellSize) + 2) + col
-
-        switch g.state {
-        case .began:
-            guard index >= 0 && index < itemCount else { return }
-            draggingIndex = index
-            dragStartOffset = contentOffset
-            gridLayer.draggingIndex = index
-            gridLayer.dragPosition = loc
-            // optionally animate the source cell (e.g. fade)
-        case .changed:
-            guard draggingIndex != nil else { return }
-            gridLayer.dragPosition = loc
-            // compute target index under current pos
-            let worldPos = CGPoint(x: contentOffset.x + loc.x, y: contentOffset.y + loc.y)
-            let targetCol = Int(floor(worldPos.x / cellSize))
-            let targetRow = Int(floor(worldPos.y / cellSize))
-            let targetIndex = targetRow * max(1, Int(bounds.width / cellSize) + 2) + targetCol
-            if targetIndex >= 0 && targetIndex < itemCount && targetIndex != draggingIndex {
-                // perform data swap (simple approach: swap positions)
-                swapItems(at: draggingIndex!, and: targetIndex)
-                draggingIndex = targetIndex
-                gridLayer.draggingIndex = draggingIndex
+class OptimizedGridView: UIView {
+    var numberOfRows: Int = 0
+    var numberOfColumns: Int = 0
+    var gridSize: CGSize = .zero
+    
+    // 使用 CALayer 来提高性能
+    private var gridLayers: [CALayer] = []
+    
+    func configureGrid(rows: Int, columns: Int, totalSize: CGSize) {
+        self.numberOfRows = rows
+        self.numberOfColumns = columns
+        
+        // 计算每个方格的大小
+        let cellWidth = totalSize.width / CGFloat(columns)
+        let cellHeight = totalSize.height / CGFloat(rows)
+        self.gridSize = CGSize(width: cellWidth, height: cellHeight)
+        
+        // 设置视图的frame
+        self.frame = CGRect(origin: .zero, size: totalSize)
+        
+        // 创建网格图层
+        createGridLayers()
+    }
+    
+    private func createGridLayers() {
+        // 清除旧图层
+        gridLayers.forEach { $0.removeFromSuperlayer() }
+        gridLayers.removeAll()
+        
+        let colors: [UIColor] = [.systemBlue, .systemGreen, .systemOrange, .systemPurple, .systemTeal]
+        
+        for row in 0..<numberOfRows {
+            for column in 0..<numberOfColumns {
+                let layer = createGridLayer(
+                    row: row,
+                    column: column,
+                    color: colors.randomElement() ?? .systemGray,
+                    number: row * numberOfColumns + column + 1
+                )
+                self.layer.addSublayer(layer)
+                gridLayers.append(layer)
             }
-            gridLayer.setNeedsDisplay()
-        case .ended, .cancelled:
-            // finish drag
-            draggingIndex = nil
-            gridLayer.draggingIndex = nil
-            gridLayer.dragPosition = nil
-            gridLayer.setNeedsDisplay()
-        default:
-            break
         }
     }
-
-    private func swapItems(at a: Int, and b: Int) {
-        guard a != b else { return }
-        // In real app you maintain an array of models. Here we only care about indices: swapping means their order changed.
-        // For demonstration we'll keep itemCount same but this is where you should update your backing data array.
-        // Optionally animate the change (not shown) — just trigger redraw.
-        // Example: if you had [0,1,2,3,...] you'd swap content of a and b
-        // For this sample, we just markNeedsDisplay (user should maintain model)
+    
+    private func createGridLayer(row: Int, column: Int, color: UIColor, number: Int) -> CALayer {
+        let x = CGFloat(column) * gridSize.width
+        let y = CGFloat(row) * gridSize.height
+        
+        let layer = CALayer()
+        layer.frame = CGRect(x: x, y: y, width: gridSize.width, height: gridSize.height)
+        layer.backgroundColor = color.cgColor
+        layer.borderWidth = 0.5
+        layer.borderColor = UIColor.black.cgColor
+        
+        // 添加序号文本
+        addNumberToLayer(layer, number: number)
+        
+        return layer
+    }
+    
+    private func addNumberToLayer(_ layer: CALayer, number: Int) {
+        let textLayer = CATextLayer()
+        textLayer.string = "\(number)"
+        textLayer.fontSize = 4
+        textLayer.foregroundColor = UIColor.white.cgColor
+        textLayer.alignmentMode = .center
+        textLayer.contentsScale = UIScreen.main.scale
+        
+        textLayer.frame = CGRect(
+            x: 0,
+            y: layer.bounds.midY - 6,
+            width: layer.bounds.width,
+            height: 12
+        )
+        
+        layer.addSublayer(textLayer)
     }
 }
