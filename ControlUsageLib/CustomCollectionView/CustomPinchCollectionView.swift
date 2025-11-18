@@ -19,7 +19,7 @@ struct GridConfig {
                                          height: CGFloat(GridConfig.itemMaxRow) * GridConfig.itemNormalHeight)
     
     /// 方格图边距
-    static let gridViewPadding:CGFloat = 0
+    static let gridViewPadding:CGFloat = 500
 }
 
 class GridViewController: UIViewController {
@@ -126,15 +126,11 @@ extension GridViewController: UIScrollViewDelegate {
         return gridView
     }
     
-    func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
-        let contentOffset = scrollView.contentOffset
-        zoomBeginOffset = contentOffset
-        if let pinch = scrollView.pinchGestureRecognizer {
-            pinchCenterInGrid = pinch.location(in: gridView)
-        } else {
-            pinchCenterInGrid = CGPoint(x: gridView.bounds.midX, y: gridView.bounds.midY)
-        }
-    }
+//    func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
+//        if let pinch = scrollView.pinchGestureRecognizer {
+//            pinchCenterInGrid = pinch.location(in: gridView)
+//        }
+//    }
     
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
 
@@ -142,7 +138,7 @@ extension GridViewController: UIScrollViewDelegate {
         maintainGridViewPadding()
         // 更新 contentSize
         updateContentSize()
-        focusOnPinchCenterIfNeeded()
+//        focusOnPinchCenterIfNeeded()
         //scrollview的缩放比率大于等于1时，需要绘制坐标数字
         gridView.shouldDrawNum = scrollView.zoomScale >= 1
     }
@@ -152,7 +148,7 @@ extension GridViewController: UIScrollViewDelegate {
         maintainGridViewPadding()
         // 更新 contentSize
         updateContentSize()
-        focusOnPinchCenterIfNeeded()
+//        focusOnPinchCenterIfNeeded()
         createVisableTextLayers()
         pinchCenterInGrid = nil
     }
@@ -175,21 +171,13 @@ extension GridViewController: UIScrollViewDelegate {
     /// 根据记录的捏合中心点调整 contentOffset，确保视觉中心对准
     private func focusOnPinchCenterIfNeeded() {
         guard let targetPoint = pinchCenterInGrid else {
-            centerContentIfNeeded()
             return
         }
-        let scale = scrollView.zoomScale
-        let boundsSize = scrollView.bounds.size
-        let contentSize = scrollView.contentSize
         
-        var offsetX = targetPoint.x * scale - boundsSize.width / 2
-        var offsetY = targetPoint.y * scale - boundsSize.height / 2
+        let newPinchPoint = scrollView.pinchGestureRecognizer?.location(in: scrollView.subviews.first) ?? .zero
         
-        let maxOffsetX = max(0, contentSize.width - boundsSize.width)
-        let maxOffsetY = max(0, contentSize.height - boundsSize.height)
-        
-        offsetX = max(0, min(offsetX, maxOffsetX))
-        offsetY = max(0, min(offsetY, maxOffsetY))
+        let offsetX = newPinchPoint.x - targetPoint.x * scrollView.zoomScale
+        let offsetY = newPinchPoint.y - targetPoint.y * scrollView.zoomScale
         
         scrollView.contentOffset = CGPoint(x: offsetX, y: offsetY)
     }
@@ -227,7 +215,10 @@ class OptimizedGridView: UIView {
     
     func configureGrid(totalSize: CGSize) {
         // 设置视图的frame
-        self.frame = CGRect(origin: .zero, size: GridConfig.totalSize)
+        self.frame = CGRect(x: GridConfig.gridViewPadding,
+                            y: GridConfig.gridViewPadding,
+                            width: GridConfig.totalSize.width,
+                            height: GridConfig.totalSize.height)
         
         // 创建网格图层
         drawMinScaleAxisPath(rows: GridConfig.itemMaxRow,
@@ -358,12 +349,12 @@ final class TwoFingerScrollView:UIScrollView,UIGestureRecognizerDelegate {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupTwoFingerScroll()
+//        setupTwoFingerScroll()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        setupTwoFingerScroll()
+//        setupTwoFingerScroll()
         
     }
     
