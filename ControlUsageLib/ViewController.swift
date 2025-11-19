@@ -80,9 +80,6 @@ class ViewController: UIViewController {
     
     var fetch:FetchDemo? = nil
     
-    lazy var gridView:GridView = {
-        return GridView(frame: .zero)
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -96,10 +93,6 @@ class ViewController: UIViewController {
         fetch = FetchDemo()
         fetch?.startFetchAllData()
         
-        view.addSubview(gridView)
-        gridView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
     }
 
 

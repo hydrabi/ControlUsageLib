@@ -9,6 +9,14 @@
          contextName = "static FixtureType.deserialize(_:):SWXMLHashUsage.swift">
       </ContextState>
       <ContextState
+         contextName = "GridViewController.scrollViewWillBeginZooming(_:with:):CustomPinchCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "scrollView.isZooming">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "GridViewController.currentVisibleRect():CustomPinchCollectionView.swift">
          <PersistentStrings>
             <PersistentString
@@ -67,6 +75,28 @@
          <PersistentStrings>
             <PersistentString
                value = "view.bounds">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TwoFingerScrollView.gestureRecognizer(_:shouldReceive:):CustomPinchCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "twoFingerPan">
+            </PersistentString>
+            <PersistentString
+               value = "isZooming">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TestGridViewController.scrollViewDidZoom(_:):backup.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "scrollView.zoomScale">
+            </PersistentString>
+            <PersistentString
+               value = "scrollView.contentSize.width - scrollView.bounds.width">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
