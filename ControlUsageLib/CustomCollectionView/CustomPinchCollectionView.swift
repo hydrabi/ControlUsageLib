@@ -3,10 +3,10 @@
 //struct GridConfig {
 //    
 //    /// 常规item宽度
-//    static let itemNormalWidth:CGFloat = 100
+//    static let itemNormalWidth:CGFloat = 60
 //    
 //    /// 常规item高度
-//    static let itemNormalHeight:CGFloat = 100
+//    static let itemNormalHeight:CGFloat = 60
 //    
 //    /// 最大行数
 //    static let itemMaxRow:Int = 100
@@ -18,13 +18,8 @@
 //    static let totalSize:CGSize = CGSize(width: CGFloat(GridConfig.itemMaxColumn) * GridConfig.itemNormalWidth,
 //                                         height: CGFloat(GridConfig.itemMaxRow) * GridConfig.itemNormalHeight)
 //    
-//    static let gridViewMinSize:CGSize = CGSize(width: 500, height: 500)
-//    
-//    /// 方格图左边距
-//    static var gridViewLeading:CGFloat = 0
-//    
-//    /// 方格图上边距
-//    static var gridViewTop:CGFloat = 0
+//    /// 方格图边距
+//    static let gridViewPadding:CGFloat = 0
 //}
 //
 //class GridViewController: UIViewController {
@@ -37,13 +32,10 @@
 //    
 //    var zoomBeginOffset:CGPoint = .zero
 //    
-//    lazy var bgView:UIView = {
-//        let view = UIView()
-//        view.backgroundColor = .black
-//        return view
-//    }()
+//    /// 记录捏合开始时在 scrollView 坐标系中的中心点位置
+//    private var pinchCenterInScroll: CGPoint?
 //    
-//    /// 记录捏合开始时在 gridView 内的中心点
+//    /// 记录捏合开始时在 gridView bounds 坐标系中的中心点（相对于 gridView.bounds）
 //    private var pinchCenterInGrid: CGPoint?
 //    
 //    override func viewDidLoad() {
@@ -57,15 +49,15 @@
 //    private func setupUI() {
 //        view.backgroundColor = .black
 //        
-//        GridConfig.gridViewLeading = (view.bounds.width - GridConfig.gridViewMinSize.width) / 2
-//        GridConfig.gridViewTop = (view.bounds.height - GridConfig.gridViewMinSize.height) / 2
-//        
 //        // 创建 UIScrollView
 //        scrollView = TwoFingerScrollView(frame: view.bounds)
-////        scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+//        scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 //        scrollView.delegate = self
 //        
-//        
+//        // 设置缩放参数
+//        scrollView.minimumZoomScale = 0.1
+//        scrollView.maximumZoomScale = 2
+//        scrollView.zoomScale = 1.0
 //        
 //        view.addSubview(scrollView)
 //        
@@ -79,8 +71,8 @@
 //        scrollView.addSubview(gridView)
 //        
 //        // 设置 contentSize
-//        scrollView.contentSize = CGSize(width: GridConfig.totalSize.width + GridConfig.gridViewLeading * 2,
-//                                        height: GridConfig.totalSize.height + GridConfig.gridViewTop * 2)
+//        scrollView.contentSize = CGSize(width: GridConfig.totalSize.width + GridConfig.gridViewPadding * 2,
+//                                        height: GridConfig.totalSize.height + GridConfig.gridViewPadding * 2)
 //        
 //        updateContentSize()
 //        
@@ -92,9 +84,17 @@
 //    private func updateContentSize() {
 //        let currentSize = gridView.frame.size
 //        scrollView.contentSize = CGSize(
-//            width: currentSize.width + GridConfig.gridViewLeading * 2,
-//            height: currentSize.height + GridConfig.gridViewTop * 2
+//            width: currentSize.width + GridConfig.gridViewPadding * 2,
+//            height: currentSize.height + GridConfig.gridViewPadding * 2
 //        )
+//    }
+//    
+//    // 确保 gridView 的位置保持边距为 500
+//    private func maintainGridViewPadding() {
+//        var frame = gridView.frame
+//        frame.origin.x = GridConfig.gridViewPadding
+//        frame.origin.y = GridConfig.gridViewPadding
+//        gridView.frame = frame
 //    }
 //    
 //    // 设置双击手势
@@ -130,23 +130,96 @@
 //    }
 //    
 //    func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
-//        self.scrollView.twoFingerPan.isEnabled = false
+//        zoomBeginOffset = scrollView.contentOffset
+//        
+//        // 记录捏合中心点在 scrollView 和 gridView 坐标系中的位置
+//        if let pinch = scrollView.pinchGestureRecognizer {
+//            // 获取捏合中心点在 scrollView 坐标系中的位置（相对于 scrollView.bounds）
+//            let centerInScroll = pinch.location(in: scrollView)
+//            pinchCenterInScroll = centerInScroll
+//            
+//            // 转换到 gridView 坐标系
+//            let centerInGrid = scrollView.convert(centerInScroll, to: gridView)
+//            // 转换为相对于 gridView bounds 的坐标（减去 frame.origin 的偏移）
+//            pinchCenterInGrid = CGPoint(
+//                x: centerInGrid.x - gridView.frame.origin.x,
+//                y: centerInGrid.y - gridView.frame.origin.y
+//            )
+//        } else {
+//            // 如果没有捏合手势，使用视图中心
+//            let centerInScroll = CGPoint(x: scrollView.bounds.midX, y: scrollView.bounds.midY)
+//            pinchCenterInScroll = centerInScroll
+//            let centerInGrid = scrollView.convert(centerInScroll, to: gridView)
+//            pinchCenterInGrid = CGPoint(
+//                x: centerInGrid.x - gridView.frame.origin.x,
+//                y: centerInGrid.y - gridView.frame.origin.y
+//            )
+//        }
 //    }
 //    
 //    func scrollViewDidZoom(_ scrollView: UIScrollView) {
-//
+//        // 缩放时保持 gridView 的边距
+//        maintainGridViewPadding()
 //        // 更新 contentSize
 //        updateContentSize()
+//        
+//        // 调整 contentOffset 以保持捏合中心点在视图中心
+//        adjustContentOffsetForZoomCenter(in: scrollView)
+//        
 //        //scrollview的缩放比率大于等于1时，需要绘制坐标数字
-//        gridView.shouldDrawNum = scrollView.zoomScale >= 0.8
+//        gridView.shouldDrawNum = scrollView.zoomScale >= 1
 //    }
 //    
 //    func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
+//        // 缩放时保持 gridView 的边距
+//        maintainGridViewPadding()
 //        // 更新 contentSize
 //        updateContentSize()
-//        createVisableTextLayers()
+//        
+//        // 最终调整 contentOffset
+//        adjustContentOffsetForZoomCenter(in: scrollView)
+//        
+//        // 清除记录的捏合中心点
 //        pinchCenterInGrid = nil
-//        self.scrollView.twoFingerPan.isEnabled = true
+//        pinchCenterInScroll = nil
+//        
+//        createVisableTextLayers()
+//    }
+//    
+//    /// 根据记录的捏合中心点调整 contentOffset，使该点在缩放后保持在视图中的相对位置不变
+//    private func adjustContentOffsetForZoomCenter(in scrollView: UIScrollView) {
+//        guard let centerInGrid = pinchCenterInGrid,
+//              let centerInScroll = pinchCenterInScroll else { return }
+//        
+//        let scale = scrollView.zoomScale
+//        let contentSize = scrollView.contentSize
+//        let boundsSize = scrollView.bounds.size
+//        
+//        // 计算缩放后该点在 gridView bounds 中的新位置
+//        let scaledPointInGridX = centerInGrid.x * scale
+//        let scaledPointInGridY = centerInGrid.y * scale
+//        
+//        // 计算该点在 scrollView 坐标系中的新位置（考虑 gridView 的 frame.origin）
+//        let newPointInScrollX = scaledPointInGridX + gridView.frame.origin.x
+//        let newPointInScrollY = scaledPointInGridY + gridView.frame.origin.y
+//        
+//        // 计算需要调整的 contentOffset，使得该点在 scrollView 中的位置保持不变
+//        // 新位置 - 旧位置 = contentOffset 需要调整的量
+//        let offsetDeltaX = newPointInScrollX - centerInScroll.x
+//        let offsetDeltaY = newPointInScrollY - centerInScroll.y
+//        
+//        // 计算新的 contentOffset（基于缩放开始时的偏移量）
+//        var newOffsetX = zoomBeginOffset.x + offsetDeltaX
+//        var newOffsetY = zoomBeginOffset.y + offsetDeltaY
+//        
+//        // 约束在有效范围内
+//        let maxOffsetX = max(0, contentSize.width - boundsSize.width)
+//        let maxOffsetY = max(0, contentSize.height - boundsSize.height)
+//        
+//        newOffsetX = max(0, min(newOffsetX, maxOffsetX))
+//        newOffsetY = max(0, min(newOffsetY, maxOffsetY))
+//        
+//        scrollView.contentOffset = CGPoint(x: newOffsetX, y: newOffsetY)
 //    }
 //    
 //    func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -163,7 +236,6 @@
 //        
 //        return visableRect
 //    }
-//    
 //}
 //
 //class OptimizedGridView: UIView {
@@ -182,10 +254,7 @@
 //    
 //    func configureGrid(totalSize: CGSize) {
 //        // 设置视图的frame
-//        self.frame = CGRect(x: GridConfig.gridViewLeading,
-//                            y: GridConfig.gridViewTop,
-//                            width: GridConfig.totalSize.width,
-//                            height: GridConfig.totalSize.height)
+//        self.frame = CGRect(origin: .zero, size: GridConfig.totalSize)
 //        
 //        // 创建网格图层
 //        drawMinScaleAxisPath(rows: GridConfig.itemMaxRow,
@@ -326,20 +395,11 @@
 //    }
 //    
 //    private func setupTwoFingerScroll() {
-//        // 设置缩放参数
-//        minimumZoomScale = 0.05
-//        maximumZoomScale = 1
-//        zoomScale = 1.0
-//        bouncesZoom = false
-//        
 //        isScrollEnabled = false
 //        panGestureRecognizer.isEnabled = false
 //        // 禁用所有子手势，避免一指拖动画面
 //        for gesture in gestureRecognizers ?? [] {
 //            if gesture is UIPanGestureRecognizer && gesture !== twoFingerPan {
-//                gesture.isEnabled = false
-//            }
-//            if gesture is UISwipeGestureRecognizer {
 //                gesture.isEnabled = false
 //            }
 //        }
@@ -370,7 +430,4 @@
 //    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
 //        return false
 //    }
-//    
 //}
-//
-//

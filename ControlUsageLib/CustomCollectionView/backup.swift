@@ -39,6 +39,9 @@ struct GridConfig {
     
     /// 方格图上边距
     static var gridViewTop:CGFloat = 0
+    
+    /// scale超过多少可以画序号
+    static var gridShouldDrawNumScale:CGFloat = 0.8
 }
 
 class TestGridViewController: UIViewController {
@@ -60,6 +63,11 @@ class TestGridViewController: UIViewController {
     /// 记录捏合开始时在 gridView 内的中心点
     private var pinchCenterInGrid: CGPoint?
     
+    /// 记录捏合开始时在 gridView 内的中心点（针对所有scale，都要用相对比例存储！）
+    private var pinchCenterRatio: CGPoint?
+    
+    private var pinchContentOffsetRatio:CGPoint = .zero
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
@@ -74,35 +82,33 @@ class TestGridViewController: UIViewController {
         GridConfig.gridViewTop = (view.bounds.height - GridConfig.gridMinSize.height) / 2
         
         // 创建 UIScrollView
-        scrollView = UIScrollView(frame: view.bounds)
+        scrollView = UIScrollView(frame: CGRect(x: 0, y: 20, width: view.bounds.width, height: view.bounds.height))
         scrollView.delegate = self
-        scrollView.minimumZoomScale = 0.5
+        scrollView.minimumZoomScale = 0.04
         scrollView.maximumZoomScale = 1
         scrollView.zoomScale = 1.0
         scrollView.bouncesZoom = false
+        scrollView.contentInset = UIEdgeInsets(top: GridConfig.gridViewTop,
+                                               left: GridConfig.gridViewLeading,
+                                               bottom: GridConfig.gridViewTop,
+                                               right: GridConfig.gridViewLeading)
         
-        bgView.addSubview(gridView)
+//        bgView.addSubview(gridView)
         
         view.addSubview(scrollView)
         
         // 创建网格视图
-        gridView.configureGrid(totalSize: GridConfig.gridMinSize)
-        //创建最大视图坐标
-//        gridView.drawMaxScaleAxisPath(rows: GridConfig.itemMaxRow,
-//                                      columns: GridConfig.itemMaxColumn,
-//                                      totalSize: CGSize(width: GridConfig.gridMaxSize.width,
-//                                                        height: GridConfig.gridMaxSize.height))
-        gridView.drawMinScaleAxisPath(rows: GridConfig.itemMaxRow,
-                                      columns: GridConfig.itemMaxColumn,
-                                      totalSize: GridConfig.gridMinSize)
+        gridView.configureGrid(totalSize: GridConfig.gridMaxSize)
+        gridView.drawScaleAxisPath(rows: GridConfig.itemMaxRow,
+                                   columns: GridConfig.itemMaxColumn,
+                                   totalSize: GridConfig.gridMaxSize,
+                                   scale: scrollView.zoomScale)
         
         
         // 添加到 scrollView
-        scrollView.addSubview(bgView)
+        scrollView.addSubview(gridView)
 
         updateContentSize()
-        
-        gridView.shouldDrawNum = scrollView.zoomScale >= 1
         createVisableTextLayers()
     }
 
@@ -149,46 +155,23 @@ extension TestGridViewController: UIScrollViewDelegate {
     }
     
     func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
-        self.scrollView.isScrollEnabled = false
-        if let pinch = scrollView.pinchGestureRecognizer {
-            // 1. 手势在 scrollView 中的中心
-            let centerInScroll = pinch.location(in: scrollView)
-            // 2. 转换到 gridView 坐标系，记下初始点
-            let centerInGrid = scrollView.convert(centerInScroll, to: gridView)
-            pinchCenterInGrid = centerInGrid
-        }
+        
     }
     
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
-
         // 更新 contentSize
         updateContentSize()
-        
-        guard let centerInGrid = pinchCenterInGrid else { return }
-        // 重新计算该点在缩放后的 gridView 中的位置
-        let scaledPoint = CGPoint(x: centerInGrid.x * scrollView.zoomScale,
-                                  y: centerInGrid.y * scrollView.zoomScale)
-        
-        // 围绕手势缩放
-        let newOffset = CGPoint(x: scaledPoint.x - centerInGrid.x,
-                                y: scaledPoint.y - centerInGrid.y)
-        
-        // 5. 约束防止越界
-//        newOffset.x = max(0, min(newOffset.x, scrollView.contentSize.width - scrollView.bounds.width))
-//        newOffset.y = max(0, min(newOffset.y, scrollView.contentSize.height - scrollView.bounds.height))
-        scrollView.contentOffset = newOffset
-        
-        
-        //scrollview的缩放比率大于等于1时，需要绘制坐标数字
-//        gridView.shouldDrawNum = scrollView.zoomScale >= 0.8
-        print("gridView的size为\(gridView.frame.size),scale为\(scrollView.zoomScale)")
+        gridView.drawScaleAxisPath(rows: GridConfig.itemMaxRow,
+                                      columns: GridConfig.itemMaxColumn,
+                                      totalSize: GridConfig.gridMaxSize,
+                                      scale: scrollView.zoomScale)
+        createVisableTextLayers()
     }
     
     func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
         // 更新 contentSize
         updateContentSize()
         createVisableTextLayers()
-        pinchCenterInGrid = nil
         self.scrollView.isScrollEnabled = true
     }
     
@@ -196,13 +179,16 @@ extension TestGridViewController: UIScrollViewDelegate {
         createVisableTextLayers()
         print("gridView的偏移量为\(scrollView.contentOffset)")
         print("gridView的frame为\(gridView.frame)")
+        print("scrollview的frame为\(scrollView.frame)")
+        print("scrollview的contentSize为\(scrollView.contentSize)")
+        print("scrollView的scale为\(scrollView.zoomScale)")
     }
     
     private func currentVisibleRect() -> CGRect {
         //将scrollview的坐标系转换为GridView的坐标系
         let rectInGrid = scrollView.convert(scrollView.bounds, to: gridView)
         let visableRect = gridView.bounds.intersection(rectInGrid)
-//        print("转换后的GridView范围为\(rectInGrid),可视范围为\(visableRect)")
+        print("转换后的GridView范围为\(rectInGrid),可视范围为\(visableRect)")
         
         return visableRect
     }
@@ -212,7 +198,11 @@ extension TestGridViewController: UIScrollViewDelegate {
 
 final class GridView:UIView {
     /// 是否应该绘制坐标数字
-    var shouldDrawNum:Bool = false
+    var shouldDrawNum:Bool {
+        get {
+            return scale >= GridConfig.gridShouldDrawNumScale
+        }
+    }
     
     // 使用 CALayer 来提高性能
     private var gridLayers: [CALayer] = []
@@ -228,14 +218,33 @@ final class GridView:UIView {
     
     var scales:[(Int,Int)] = [(1,5),(5,10),(10,15),(20,20)]
     
+    var scale:CGFloat = 0
+    
     func configureGrid(totalSize: CGSize) {
         // 设置视图的frame
-        self.frame = CGRect(x: GridConfig.gridViewLeading,
-                            y: GridConfig.gridViewTop,
+        self.frame = CGRect(x: 0,
+                            y: 0,
                             width: totalSize.width,
                             height: totalSize.height)
         self.backgroundColor = .black
         
+    }
+    
+    func drawScaleAxisPath(rows:Int,columns:Int,totalSize:CGSize,scale:CGFloat = 1) {
+        guard self.scale != scale else {return}
+        
+        minScaleAxisLayer.removeFromSuperlayer()
+        minScaleBorderLayer.removeFromSuperlayer()
+        maxScaleAxisLayer.removeFromSuperlayer()
+        
+        if scale >= 1 {
+            drawMaxScaleAxisPath(rows: rows, columns: columns, totalSize: totalSize)
+        }
+        else {
+            drawMinScaleAxisPath(rows: rows, columns: columns, totalSize: totalSize,scale:scale)
+        }
+        
+        self.scale = scale
     }
     
     /// 绘制网格图层
@@ -243,9 +252,15 @@ final class GridView:UIView {
     ///   - rows: 行
     ///   - columns: 列
     ///   - totalSize: 宽高
-    func drawMinScaleAxisPath(rows: Int, columns: Int, totalSize: CGSize) {
+    func drawMinScaleAxisPath(rows: Int, columns: Int, totalSize: CGSize,scale:CGFloat = 1) {
         minScaleAxisLayer.removeFromSuperlayer()
         minScaleBorderLayer.removeFromSuperlayer()
+        maxScaleAxisLayer.removeFromSuperlayer()
+        
+        //根据缩放scale重新计算lineWidth 防止缩放时线条变模糊
+        let baseLineWidth:CGFloat = 1 / scale
+        let baseBorderLineWidth:CGFloat = 2 / scale
+        
         
         let path = UIBezierPath()
         
@@ -263,7 +278,7 @@ final class GridView:UIView {
         }
         
         minScaleAxisLayer.path = path.cgPath
-        minScaleAxisLayer.lineWidth = 1.0
+        minScaleAxisLayer.lineWidth = baseLineWidth
         minScaleAxisLayer.strokeColor = RGB(r: 179, g: 179, b: 179).cgColor
         self.layer.addSublayer(minScaleAxisLayer)
         
@@ -287,7 +302,7 @@ final class GridView:UIView {
         }
         
         minScaleBorderLayer.path = borderPath.cgPath
-        minScaleBorderLayer.lineWidth = 2.0
+        minScaleBorderLayer.lineWidth = baseBorderLineWidth
         minScaleBorderLayer.fillColor = UIColor.clear.cgColor
         minScaleBorderLayer.strokeColor = RGB(r: 179, g: 179, b: 179).cgColor
         self.layer.addSublayer(minScaleBorderLayer)
@@ -299,9 +314,6 @@ final class GridView:UIView {
     ///   - columns: 列
     ///   - totalSize: 宽高
     func drawMaxScaleAxisPath(rows: Int, columns: Int, totalSize: CGSize) {
-        minScaleAxisLayer.removeFromSuperlayer()
-        minScaleBorderLayer.removeFromSuperlayer()
-        maxScaleAxisLayer.removeFromSuperlayer()
         
         let path = UIBezierPath()
         
@@ -320,8 +332,7 @@ final class GridView:UIView {
         
         maxScaleAxisLayer.path = path.cgPath
         maxScaleAxisLayer.lineJoin = .round
-//        maxScaleAxisLayer.lineDashPhase = 0
-//        maxScaleAxisLayer.lineDashPattern = [4]
+        maxScaleAxisLayer.lineDashPattern = [4]
         maxScaleAxisLayer.lineWidth = 1.0
         maxScaleAxisLayer.strokeColor = RGB(r: 179, g: 179, b: 179).cgColor
         self.layer.addSublayer(maxScaleAxisLayer)
@@ -330,31 +341,32 @@ final class GridView:UIView {
     /// 根据可视范围创建数字坐标图层
     /// - Parameter visableRect: 可视范围
     func createNumberLayers(visableRect:CGRect) {
-//        // 清除旧图层
-//        gridLayers.forEach { $0.removeFromSuperlayer() }
-//        gridLayers.removeAll()
-//
-//        if shouldDrawNum {
-//            //通过可视范围计算
-//            let minRowNum = min(Int(floor(visableRect.minY / GridConfig.itemNormalHeight)),
-//                                GridConfig.itemMaxRow)
-//            let maxRowNum = min(Int(ceil(visableRect.maxY / GridConfig.itemNormalHeight)),
-//                                GridConfig.itemMaxRow)
-//            let minColumnNum = min(Int(floor(visableRect.minX / GridConfig.itemNormalWidth)),
-//                                   GridConfig.itemMaxColumn)
-//            let maxColumnNum = min(Int(ceil(visableRect.maxX / GridConfig.itemNormalWidth)),
-//                                   GridConfig.itemMaxColumn)
-//
-//            for row in minRowNum..<maxRowNum {
-//                for column in minColumnNum..<maxColumnNum {
-//                    let textLayer = addNumberToLayer(row: row,
-//                                                     column: column,
-//                                                     number: row * GridConfig.itemMaxColumn + column + 1)
-//                    self.layer.addSublayer(textLayer)
-//                    gridLayers.append(textLayer)
-//                }
-//            }
-//        }
+        // 清除旧图层
+        gridLayers.forEach { $0.removeFromSuperlayer() }
+        gridLayers.removeAll()
+
+        if shouldDrawNum {
+            //通过可视范围计算
+            let minRowNum = min(Int(floor(visableRect.minY / GridConfig.itemMaxHeight)),
+                                GridConfig.itemMaxRow)
+            let maxRowNum = min(Int(ceil(visableRect.maxY / GridConfig.itemMaxHeight)),
+                                GridConfig.itemMaxRow)
+            let minColumnNum = min(Int(floor(visableRect.minX / GridConfig.itemMaxWidth)),
+                                   GridConfig.itemMaxColumn)
+            let maxColumnNum = min(Int(ceil(visableRect.maxX / GridConfig.itemMaxWidth)),
+                                   GridConfig.itemMaxColumn)
+
+            for row in minRowNum..<maxRowNum {
+                for column in minColumnNum..<maxColumnNum {
+                    let textLayer = addNumberToLayer(row: row,
+                                                     column: column,
+                                                     number: row * GridConfig.itemMaxColumn + column + 1,
+                                                     gridSize: GridConfig.gridMaxSize)
+                    self.layer.addSublayer(textLayer)
+                    gridLayers.append(textLayer)
+                }
+            }
+        }
     }
 
     /// 创建单个数字坐标图层
@@ -364,8 +376,8 @@ final class GridView:UIView {
     ///   - number: 数字
     /// - Returns: CATextLayer
     private func addNumberToLayer(row: Int, column: Int, number: Int,gridSize:CGSize) -> CATextLayer {
-        let itemWidth = gridSize.width / CGFloat(column)
-        let itemHeight = gridSize.height / CGFloat(row)
+        let itemWidth = gridSize.width / CGFloat(GridConfig.itemMaxColumn)
+        let itemHeight = gridSize.height / CGFloat(GridConfig.itemMaxRow)
         let x = CGFloat(column) * itemWidth
         let y = CGFloat(row) * itemHeight
         
