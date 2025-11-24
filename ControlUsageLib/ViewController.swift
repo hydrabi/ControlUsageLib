@@ -8,14 +8,6 @@
 import UIKit
 import SnapKit
 
-extension String {
-    /// 计算文本长度
-    func widthFor(font: UIFont, height: CGFloat = 20) -> CGFloat {
-        let rect = NSString(string: self).boundingRect(with: CGSize(width: CGFloat(MAXFLOAT), height: height), options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
-        return ceil(rect.width)
-    }
-}
-
 extension Array{
     
     /// 去除重复元素

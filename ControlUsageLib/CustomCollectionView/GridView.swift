@@ -1,206 +1,53 @@
-//   backup.swift
+//   GridView.swift
 //   ControlUsageLib
 //
-//   Created by Ted on 2025/11/17
+//   Created by Ted on 2025/11/24
 //   
 
 
 import Foundation
 
-struct GridConfig {
-    
-    /// 最大行数
-    static let itemMaxRow:Int = 100
-    
-    /// 最大列数
-    static let itemMaxColumn:Int = 100
-    
-    /// item最小宽度
-    static let itemMinWidth:CGFloat = 4
-    
-    /// item最小高度
-    static let itemMinHeight:CGFloat = 4
-    
-    /// grid最小size
-    static let gridMinSize:CGSize = CGSize(width: CGFloat(GridConfig.itemMaxColumn) * GridConfig.itemMinWidth,
-                                           height: CGFloat(GridConfig.itemMaxRow) * GridConfig.itemMinHeight)
-    /// 常规item宽度
-    static let itemMaxWidth:CGFloat = 100
-    
-    /// 常规item高度
-    static let itemMaxHeight:CGFloat = 100
-    
-    // 总尺寸
-    static let gridMaxSize:CGSize = CGSize(width: CGFloat(GridConfig.itemMaxColumn) * GridConfig.itemMaxWidth,
-                                         height: CGFloat(GridConfig.itemMaxRow) * GridConfig.itemMaxHeight)
-    
-    /// 方格图左边距
-    static var gridViewLeading:CGFloat = 0
-    
-    /// 方格图上边距
-    static var gridViewTop:CGFloat = 0
-    
-    /// scale超过多少可以画序号
-    static var gridShouldDrawNumScale:CGFloat = 0.8
-}
+/// 二指滑动scrollview
+final class TwoFingerScrollView:UIScrollView,UIGestureRecognizerDelegate {
 
-class TestGridViewController: UIViewController {
-    
-    var scrollView: UIScrollView!
-    var gridView = GridView()
-    
-    /// gridView 与 scrollView 的边距
-    var padding:CGFloat = 100
-    
-    var zoomBeginOffset:CGPoint = .zero
-    
-    lazy var bgView:UIView = {
-        let view = UIView()
-        view.backgroundColor = .black
-        return view
-    }()
-    
-    /// 记录捏合开始时在 gridView 内的中心点
-    private var pinchCenterInGrid: CGPoint?
-    
-    /// 记录捏合开始时在 gridView 内的中心点（针对所有scale，都要用相对比例存储！）
-    private var pinchCenterRatio: CGPoint?
-    
-    private var pinchContentOffsetRatio:CGPoint = .zero
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .black
-        navigationController?.navigationBar.isHidden = true
-        setupUI()
-    }
-    
-    private func setupUI() {
-        view.backgroundColor = .black
-        
-        GridConfig.gridViewLeading = (view.bounds.width - GridConfig.gridMinSize.width) / 2
-        GridConfig.gridViewTop = (view.bounds.height - GridConfig.gridMinSize.height) / 2
-        
-        // 创建 UIScrollView
-        scrollView = UIScrollView(frame: CGRect(x: 0, y: 20, width: view.bounds.width, height: view.bounds.height))
-        scrollView.delegate = self
-        scrollView.minimumZoomScale = 0.04
-        scrollView.maximumZoomScale = 1
-        scrollView.zoomScale = 1.0
-        scrollView.bouncesZoom = false
-        scrollView.contentInset = UIEdgeInsets(top: GridConfig.gridViewTop,
-                                               left: GridConfig.gridViewLeading,
-                                               bottom: GridConfig.gridViewTop,
-                                               right: GridConfig.gridViewLeading)
-        
-//        bgView.addSubview(gridView)
-        
-        view.addSubview(scrollView)
-        
-        // 创建网格视图
-        gridView.configureGrid(totalSize: GridConfig.gridMaxSize)
-        gridView.drawScaleAxisPath(rows: GridConfig.itemMaxRow,
-                                   columns: GridConfig.itemMaxColumn,
-                                   totalSize: GridConfig.gridMaxSize,
-                                   scale: scrollView.zoomScale)
-        
-        
-        // 添加到 scrollView
-        scrollView.addSubview(gridView)
-
-        updateContentSize()
-        createVisableTextLayers()
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupTwoFingerScroll()
     }
 
-    
-    // 更新 contentSize，确保包含边距
-    private func updateContentSize() {
-        let currentSize = gridView.frame.size
-        scrollView.contentSize = CGSize(
-            width: currentSize.width + GridConfig.gridViewLeading * 2,
-            height: currentSize.height + GridConfig.gridViewTop * 2
-        )
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupTwoFingerScroll()
     }
-    
-    // 设置双击手势
-    private func setupDoubleTapGesture() {
-        let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
-        doubleTapRecognizer.numberOfTapsRequired = 2
-        scrollView.addGestureRecognizer(doubleTapRecognizer)
-    }
-    
-    @objc private func handleDoubleTap(_ recognizer: UITapGestureRecognizer) {
-        if scrollView.zoomScale > scrollView.minimumZoomScale {
-            // 如果已放大，则缩小
-            scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
-        } else {
-            // 如果已缩小，则放大到中等比例
-            scrollView.setZoomScale(2.0, animated: true)
+
+    private func setupTwoFingerScroll() {
+        for gesture in gestureRecognizers ?? [] {
+            //滑动手势最小手指数改成2
+            if let pan = gesture as? UIPanGestureRecognizer {
+                pan.minimumNumberOfTouches = 2
+            }
         }
     }
-    
-    /// 格局可视范围绘制坐标数字
-    func createVisableTextLayers() {
-        //获取可视范围
-        let visableRect = currentVisibleRect()
-        //根据可视范围绘制坐标
-        gridView.createNumberLayers(visableRect: visableRect)
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return false
     }
 }
 
-// MARK: - UIScrollViewDelegate
-extension TestGridViewController: UIScrollViewDelegate {
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return gridView
-    }
-    
-    func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
-        
-    }
-    
-    func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        // 更新 contentSize
-        updateContentSize()
-        gridView.drawScaleAxisPath(rows: GridConfig.itemMaxRow,
-                                      columns: GridConfig.itemMaxColumn,
-                                      totalSize: GridConfig.gridMaxSize,
-                                      scale: scrollView.zoomScale)
-        createVisableTextLayers()
-    }
-    
-    func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
-        // 更新 contentSize
-        updateContentSize()
-        createVisableTextLayers()
-        self.scrollView.isScrollEnabled = true
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        createVisableTextLayers()
-        print("gridView的偏移量为\(scrollView.contentOffset)")
-        print("gridView的frame为\(gridView.frame)")
-        print("scrollview的frame为\(scrollView.frame)")
-        print("scrollview的contentSize为\(scrollView.contentSize)")
-        print("scrollView的scale为\(scrollView.zoomScale)")
-    }
-    
-    private func currentVisibleRect() -> CGRect {
-        //将scrollview的坐标系转换为GridView的坐标系
-        let rectInGrid = scrollView.convert(scrollView.bounds, to: gridView)
-        let visableRect = gridView.bounds.intersection(rectInGrid)
-        print("转换后的GridView范围为\(rectInGrid),可视范围为\(visableRect)")
-        
-        return visableRect
-    }
-    
-}
-
-
+/// 自定义网格图
 final class GridView:UIView {
+    
     /// 是否应该绘制坐标数字
     var shouldDrawNum:Bool {
         get {
             return scale >= GridConfig.gridShouldDrawNumScale
+        }
+    }
+    
+    /// 是否应该绘制设备
+    var shouldDrawFixture:Bool {
+        get {
+            return scale >= GridConfig.gridShouldDrawFixtureScale
         }
     }
     
@@ -216,20 +63,55 @@ final class GridView:UIView {
     // scale最大时的CAShapeLayer边界分区线条实现
     var maxScaleAxisLayer:CAShapeLayer = CAShapeLayer()
     
-    var scales:[(Int,Int)] = [(1,5),(5,10),(10,15),(20,20)]
+    // 设备图层
+    var lampLayers:[AULampLayoutLayer] = []
     
+    //当前scale
     var scale:CGFloat = 0
     
-    func configureGrid(totalSize: CGSize) {
+    //当前选中的设备
+    private var selectedLampLayer:AULampLayoutLayer?
+    
+    /// 点击手势
+    private lazy var tapGestureRecognizer: UITapGestureRecognizer = {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        tap.numberOfTapsRequired = 1
+        return tap
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        addGestureRecognizer(tapGestureRecognizer)
+        isUserInteractionEnabled = true
+    }
+    
+    convenience init() {
+        self.init(frame: .zero)
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        addGestureRecognizer(tapGestureRecognizer)
+        isUserInteractionEnabled = true
+    }
+    
+    func configureGrid(totalSize: CGSize,
+                       layouts:[AULampLayout]) {
         // 设置视图的frame
         self.frame = CGRect(x: 0,
                             y: 0,
                             width: totalSize.width,
                             height: totalSize.height)
         self.backgroundColor = .black
-        
+        //创建设备图层
+        createFixtureLayers(layouts: layouts)
     }
-    
+    /// 绘制网格图层
+    /// - Parameters:
+    ///   - rows: 行
+    ///   - columns: 列
+    ///   - totalSize: 总宽高
+    ///   - scale: 当前scrollview比例
     func drawScaleAxisPath(rows:Int,columns:Int,totalSize:CGSize,scale:CGFloat = 1) {
         guard self.scale != scale else {return}
         
@@ -247,7 +129,7 @@ final class GridView:UIView {
         self.scale = scale
     }
     
-    /// 绘制网格图层
+    /// 绘制scale较小是的网格图层
     /// - Parameters:
     ///   - rows: 行
     ///   - columns: 列
@@ -280,7 +162,8 @@ final class GridView:UIView {
         minScaleAxisLayer.path = path.cgPath
         minScaleAxisLayer.lineWidth = baseLineWidth
         minScaleAxisLayer.strokeColor = RGB(r: 179, g: 179, b: 179).cgColor
-        self.layer.addSublayer(minScaleAxisLayer)
+        minScaleAxisLayer.fillColor = UIColor.clear.cgColor
+        self.layer.insertSublayer(minScaleAxisLayer,at: 0)
         
         let borderPath = UIBezierPath(roundedRect: CGRect(x: 0,
                                                                   y: 0,
@@ -305,7 +188,7 @@ final class GridView:UIView {
         minScaleBorderLayer.lineWidth = baseBorderLineWidth
         minScaleBorderLayer.fillColor = UIColor.clear.cgColor
         minScaleBorderLayer.strokeColor = RGB(r: 179, g: 179, b: 179).cgColor
-        self.layer.addSublayer(minScaleBorderLayer)
+        self.layer.insertSublayer(minScaleBorderLayer, above: minScaleAxisLayer)
     }
     
     /// 绘制网格图层
@@ -320,11 +203,13 @@ final class GridView:UIView {
         // 计算每个方格的大小
         let cellWidth:CGFloat = totalSize.width / CGFloat(columns)
         let cellHeight:CGFloat = totalSize.height / CGFloat(rows)
+        //画行
         for i in 0...rows {
             path.move(to: CGPoint(x:0, y: cellHeight * CGFloat(i)))
             path.addLine(to: CGPoint(x: totalSize.width, y: cellHeight * CGFloat(i)))
         }
         
+        //画列
         for i in 0...columns {
             path.move(to: CGPoint(x: cellWidth * CGFloat(i), y: 0))
             path.addLine(to: CGPoint(x: cellWidth * CGFloat(i), y: totalSize.height))
@@ -335,12 +220,21 @@ final class GridView:UIView {
         maxScaleAxisLayer.lineDashPattern = [4]
         maxScaleAxisLayer.lineWidth = 1.0
         maxScaleAxisLayer.strokeColor = RGB(r: 179, g: 179, b: 179).cgColor
-        self.layer.addSublayer(maxScaleAxisLayer)
+        // 性能优化设置
+        maxScaleAxisLayer.shouldRasterize = true
+        maxScaleAxisLayer.rasterizationScale = UIScreen.main.scale
+        maxScaleAxisLayer.drawsAsynchronously = true
+        self.layer.insertSublayer(maxScaleAxisLayer, at: 0)
     }
     
     /// 根据可视范围创建数字坐标图层
     /// - Parameter visableRect: 可视范围
     func createNumberLayers(visableRect:CGRect) {
+        
+        guard !visableRect.origin.x.isInfinite && !visableRect.origin.y.isInfinite else {
+            return
+        }
+        
         // 清除旧图层
         gridLayers.forEach { $0.removeFromSuperlayer() }
         gridLayers.removeAll()
@@ -358,11 +252,19 @@ final class GridView:UIView {
 
             for row in minRowNum..<maxRowNum {
                 for column in minColumnNum..<maxColumnNum {
+                    let number = row * GridConfig.itemMaxColumn + column + 1
                     let textLayer = addNumberToLayer(row: row,
                                                      column: column,
-                                                     number: row * GridConfig.itemMaxColumn + column + 1,
+                                                     number: number,
                                                      gridSize: GridConfig.gridMaxSize)
-                    self.layer.addSublayer(textLayer)
+                    
+                    //不能覆盖在设备图层上
+                    if let lampLayer = lampLayers.first(where: { $0.lamp.position == number && $0.superlayer != nil }) {
+                        self.layer.insertSublayer(textLayer, below: lampLayer)
+                    }
+                    else {
+                        self.layer.addSublayer(textLayer)
+                    }
                     gridLayers.append(textLayer)
                 }
             }
@@ -385,16 +287,109 @@ final class GridView:UIView {
         textLayer.string = "\(number)"
         textLayer.fontSize = 10
         textLayer.foregroundColor = RGB(r: 179, g: 179, b: 179).cgColor
-        textLayer.alignmentMode = .natural
+        textLayer.alignmentMode = .right
         textLayer.contentsScale = UIScreen.main.scale
         
-        let leading:CGFloat = 4
+        let trail:CGFloat = 4
         
-        textLayer.frame = CGRect(x: x + leading,
+        textLayer.frame = CGRect(x: x,
                                  y: y,
-                                 width: itemWidth,
+                                 width: itemWidth - trail,
                                  height: itemHeight)
         
         return textLayer
+    }
+    
+    //创建设备图层
+    func createFixtureLayers(layouts:[AULampLayout]) {
+        lampLayers.forEach { $0.removeFromSuperlayer() }
+        lampLayers.removeAll()
+        
+        for lamp in layouts {
+            let lampLayer = AULampLayoutLayer(lamp: lamp)
+            lampLayers.append(lampLayer)
+        }
+    }
+    
+    //设备图层添加
+    func addFixtureLayers(visableRect:CGRect) {
+        guard !visableRect.origin.x.isInfinite && !visableRect.origin.y.isInfinite else {
+            return
+        }
+        
+        if shouldDrawFixture {
+            //通过可视范围计算行、列范围
+            let minRowNum = min(Int(floor(visableRect.minY / GridConfig.itemMaxHeight)),
+                                GridConfig.itemMaxRow)
+            let maxRowNum = min(Int(ceil(visableRect.maxY / GridConfig.itemMaxHeight)),
+                                GridConfig.itemMaxRow)
+            let minColumnNum = min(Int(floor(visableRect.minX / GridConfig.itemMaxWidth)),
+                                   GridConfig.itemMaxColumn)
+            let maxColumnNum = min(Int(ceil(visableRect.maxX / GridConfig.itemMaxWidth)),
+                                   GridConfig.itemMaxColumn)
+            
+            //已经添加了的设备图层
+            let addedLayers = lampLayers.filter { $0.superlayer != nil }
+            //仍未添加的设备图层
+            let unAddedLayers = lampLayers.filter { $0.superlayer == nil }
+            
+            //已经添加的图层已经不在可视范围内 移除
+            for layer in addedLayers {
+                let (row,column) = layer.numToRowColumn()
+                if row < minRowNum || row > maxRowNum || column < minColumnNum || column > maxColumnNum {
+                    layer.removeFromSuperlayer()
+                }
+            }
+            
+            //未添加的图层在可视范围内 添加
+            for layer in unAddedLayers {
+                let (row,column) = layer.numToRowColumn()
+                if (row >= minRowNum && row <= maxRowNum) && (column >= minColumnNum && column <= maxColumnNum) {
+                    self.layer.addSublayer(layer)
+                    let x = CGFloat(column) * GridConfig.itemMaxWidth
+                    let y = CGFloat(row) * GridConfig.itemMaxHeight
+                    layer.frame = CGRect(x: x,
+                                         y: y,
+                                         width: GridConfig.itemMaxWidth,
+                                         height: GridConfig.itemMaxHeight)
+                }
+            }
+        }
+        else {
+            // 清除旧图层
+            lampLayers.forEach { $0.removeFromSuperlayer() }
+        }
+    }
+}
+
+//MARK: - 点击手势
+extension GridView {
+    
+    /// 点击手势响应事件
+    /// - Parameter gesture: 点击手势
+    @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
+        let tapPoint = gesture.location(in: self)
+        guard let lampLayer = lampLayers.first(where: { $0.superlayer != nil && $0.frame.contains(tapPoint) }) else { return }
+        // 点击空白区域时还原选中
+        lampLayer.tapAction()
+        
+        //选中的图层摆在最上面
+        if lampLayer.lamp.isSelected {
+            lampLayer.removeFromSuperlayer()
+            self.layer.addSublayer(lampLayer)
+        }
+        //反选的图层居于其它设备图层之下
+        else {
+            //两边的设备如果是选中状态
+            let aboveLayers = lampLayers.filter { temp in
+                temp.lamp.isSelected &&
+                (temp.lamp.position == lampLayer.lamp.position - 1 || temp.lamp.position == lampLayer.lamp.position + 1)
+            }
+            //将其图层至于反选的设备图层之上
+            aboveLayers.forEach { temp in
+                temp.removeFromSuperlayer()
+                self.layer.insertSublayer(temp, above: lampLayer)
+            }
+        }
     }
 }

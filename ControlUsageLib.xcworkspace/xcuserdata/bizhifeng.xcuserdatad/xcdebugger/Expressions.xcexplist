@@ -17,6 +17,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "TwoFingerScrollView.gestureRecognizer(_:shouldReceive:):backup.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "panGestureRecognizer">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "GridViewController.currentVisibleRect():CustomPinchCollectionView.swift">
          <PersistentStrings>
             <PersistentString
@@ -48,6 +56,9 @@
          <PersistentStrings>
             <PersistentString
                value = "scrollView.contentSize">
+            </PersistentString>
+            <PersistentString
+               value = "gridView.frame.size">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -116,6 +127,14 @@
       </ContextState>
       <ContextState
          contextName = "static ChannelFunction.deserialize(_:):SWXMLHashUsage.swift">
+      </ContextState>
+      <ContextState
+         contextName = "TestGridViewController.centeredGridView():backup.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "gridView.frame">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "ContextDescriptorType.fieldOffsets.getter:ContextDescriptorType.swift">

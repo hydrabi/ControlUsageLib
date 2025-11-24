@@ -83,4 +83,16 @@ extension String {
         print(str)
         // 结果: ABH
     }
+    
+    /// 计算文本长度
+    func widthFor(font: UIFont, height: CGFloat = 20) -> CGFloat {
+        let rect = NSString(string: self).boundingRect(with: CGSize(width: CGFloat(MAXFLOAT), height: height), options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
+        return ceil(rect.width)
+    }
+    
+    /// 计算文本高度
+    func heightFor(font: UIFont, width: CGFloat = 100) -> CGFloat {
+        let rect = NSString(string: self).boundingRect(with: CGSize(width: width, height: CGFloat(MAXFLOAT)), options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
+        return ceil(rect.height)
+    }
 }
