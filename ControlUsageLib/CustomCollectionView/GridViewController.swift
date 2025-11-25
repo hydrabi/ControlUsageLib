@@ -66,31 +66,21 @@ struct GridConfig {
     
     /// item选中边框颜色
     static let itemSelectedBorderColor = RGB(r: 70, g: 170, b: 95)
+    
+    /// item边框错误颜色
+    static let itemErrorBorderColor = RGB(r: 252, g: 80, b: 70)
 }
 
 class GridViewController: UIViewController {
     
     var scrollView: TwoFingerScrollView!
-    var gridView = GridView()
     
-    /// gridView 与 scrollView 的边距
-    var padding:CGFloat = 100
-    
-    var zoomBeginOffset:CGPoint = .zero
-    
-    lazy var bgView:UIView = {
-        let view = UIView()
-        view.backgroundColor = .black
+    /// 网格视图
+    lazy var gridView = {
+        let view = GridView()
+        view.delegate = self
         return view
     }()
-    
-    /// 记录捏合开始时在 gridView 内的中心点
-    private var pinchCenterInGrid: CGPoint?
-    
-    /// 记录捏合开始时在 gridView 内的中心点（针对所有scale，都要用相对比例存储！）
-    private var pinchCenterRatio: CGPoint?
-    
-    private var pinchContentOffsetRatio:CGPoint = .zero
     
     /// 灯位图设备对象集合
     private var lamps:[AULampLayout] = []
@@ -165,7 +155,7 @@ class GridViewController: UIViewController {
         //获取可视范围
         let visableRect = currentVisibleRect()
         //根据可视范围绘制坐标
-        gridView.createNumberLayers(visableRect: visableRect)
+        gridView.refreshVisableLayers(visableRect: visableRect)
         gridView.addFixtureLayers(visableRect: visableRect)
     }
     
@@ -202,4 +192,19 @@ class GridViewController: UIViewController {
     }
 }
 
-
+extension GridViewController:GridViewDelegate {
+    
+    func gridViewBeginPanLamp() {
+//        //拖动设备时 scrollview禁止拖动
+//        scrollView.isScrollEnabled = false
+//        scrollView.panGestureRecognizer.isEnabled = false
+//        scrollView.pinchGestureRecognizer?.isEnabled = false
+    }
+    
+    func gridViewEndPanLamp() {
+//        //结束拖动设备 scrollview恢复拖动
+//        scrollView.isScrollEnabled = true
+//        scrollView.panGestureRecognizer.isEnabled = true
+//        scrollView.pinchGestureRecognizer?.isEnabled = true
+    }
+}

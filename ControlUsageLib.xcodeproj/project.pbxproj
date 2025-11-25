@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		0223E3F72EC60861009A9843 /* CustomPinchCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0223E3F62EC60861009A9843 /* CustomPinchCollectionView.swift */; };
 		023AE7C22E32605800A92421 /* CombindLearn+Control.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023AE7C12E32605800A92421 /* CombindLearn+Control.swift */; };
+		02466D732ED5ABD50084819A /* GridView+Pan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02466D722ED5ABD50084819A /* GridView+Pan.swift */; };
+		02466D752ED5DA7A0084819A /* GridView+Visable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02466D742ED5DA7A0084819A /* GridView+Visable.swift */; };
 		0257ED222ED4377C004C0399 /* GridViewController+ScrollViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0257ED212ED4377C004C0399 /* GridViewController+ScrollViewDelegate.swift */; };
 		0257ED242ED43B6B004C0399 /* GridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0257ED232ED43B6B004C0399 /* GridView.swift */; };
 		02584FA22C26CBF600756A42 /* GithubAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02584FA12C26CBF600756A42 /* GithubAPI.swift */; };
@@ -48,6 +50,8 @@
 /* Begin PBXFileReference section */
 		0223E3F62EC60861009A9843 /* CustomPinchCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPinchCollectionView.swift; sourceTree = "<group>"; };
 		023AE7C12E32605800A92421 /* CombindLearn+Control.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CombindLearn+Control.swift"; sourceTree = "<group>"; };
+		02466D722ED5ABD50084819A /* GridView+Pan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GridView+Pan.swift"; sourceTree = "<group>"; };
+		02466D742ED5DA7A0084819A /* GridView+Visable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GridView+Visable.swift"; sourceTree = "<group>"; };
 		0257ED212ED4377C004C0399 /* GridViewController+ScrollViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GridViewController+ScrollViewDelegate.swift"; sourceTree = "<group>"; };
 		0257ED232ED43B6B004C0399 /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
 		02584FA12C26CBF600756A42 /* GithubAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubAPI.swift; sourceTree = "<group>"; };
@@ -110,6 +114,8 @@
 				02E61D4A2ED03A7300083A5A /* AULampLayoutLayer.swift */,
 				0257ED212ED4377C004C0399 /* GridViewController+ScrollViewDelegate.swift */,
 				0257ED232ED43B6B004C0399 /* GridView.swift */,
+				02466D722ED5ABD50084819A /* GridView+Pan.swift */,
+				02466D742ED5DA7A0084819A /* GridView+Visable.swift */,
 			);
 			path = CustomCollectionView;
 			sourceTree = "<group>";
@@ -503,9 +509,11 @@
 				02584FA22C26CBF600756A42 /* GithubAPI.swift in Sources */,
 				02E61D4B2ED03A7300083A5A /* AULampLayoutLayer.swift in Sources */,
 				02D395C32B4A4EDC006EBA8C /* String+Operation.swift in Sources */,
+				02466D732ED5ABD50084819A /* GridView+Pan.swift in Sources */,
 				0257ED242ED43B6B004C0399 /* GridView.swift in Sources */,
 				026E4D822B2E99BF00A0858D /* AppDelegate.swift in Sources */,
 				02EF34652B9431C400E1D84B /* RxSwiftUsage.swift in Sources */,
+				02466D752ED5DA7A0084819A /* GridView+Visable.swift in Sources */,
 				026E4D842B2E99BF00A0858D /* SceneDelegate.swift in Sources */,
 				02CC443C2BDF733800C500CE /* CodeiumTest.swift in Sources */,
 				02CF42CE2B48FB7000F5532C /* AvoidcrashTest.m in Sources */,

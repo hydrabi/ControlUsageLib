@@ -3,39 +3,6 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "SWXMLHashUsage.parseXML():SWXMLHashUsage.swift">
-      </ContextState>
-      <ContextState
-         contextName = "static FixtureType.deserialize(_:):SWXMLHashUsage.swift">
-      </ContextState>
-      <ContextState
-         contextName = "OptimizedGridView.createTextLayers(visableRect:):CustomPinchCollectionView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "visableRect.maxY">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TwoFingerScrollView.gestureRecognizer(_:shouldReceive:):backup.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "panGestureRecognizer">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "GridViewController.currentVisibleRect():CustomPinchCollectionView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "gridView.bounds">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "FixtureType.transfromChannelModel(tempDMXMode:):FixtureType+Transform.swift">
-      </ContextState>
-      <ContextState
          contextName = "ContextDescriptorType.contextDescriptor.getter:ContextDescriptorType.swift">
          <PersistentStrings>
             <PersistentString
@@ -44,10 +11,10 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "MetadataType.kind.getter:Metadata.swift">
+         contextName = "GridViewController.updateContentSize():CustomPinchCollectionView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "UnsafePointer&lt;Int&gt;(pointer)">
+               value = "gridView.frame.size">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -63,72 +30,6 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "SegmentMenu.shouldAddGradientLayer():ViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "scrollView.frame.width">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "FixtureType.mapChannelRelativeAndAbsolute(tempLogicalChannel:isFine:channelName:minValue:maxValue:):FixtureType+RelativeAndAbsolute.swift">
-      </ContextState>
-      <ContextState
-         contextName = "GridViewController.scrollViewDidZoom(_:):CustomPinchCollectionView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "scrollView.contentSize">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "AdvancedCollectionView.handlePinch(_:):CustomPinchCollectionView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "currentScale">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "GridViewController.setupUI():CustomPinchCollectionView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "view.bounds">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TestGridViewController.scrollViewDidZoom(_:):backup.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "scrollView.zoomScale">
-            </PersistentString>
-            <PersistentString
-               value = "pinchCenterRatio">
-            </PersistentString>
-            <PersistentString
-               value = "scrollView.contentSize.width - scrollView.bounds.width">
-            </PersistentString>
-            <PersistentString
-               value = "pinchContentOffsetRatio">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TwoFingerScrollView.gestureRecognizer(_:shouldReceive:):CustomPinchCollectionView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "twoFingerPan">
-            </PersistentString>
-            <PersistentString
-               value = "isZooming">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "static ChannelFunction.deserialize(_:):SWXMLHashUsage.swift">
-      </ContextState>
-      <ContextState
          contextName = "TestGridViewController.centeredGridView():backup.swift">
          <PersistentStrings>
             <PersistentString
@@ -137,18 +38,10 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "ContextDescriptorType.fieldOffsets.getter:ContextDescriptorType.swift">
+         contextName = "GridViewController.setupUI():CustomPinchCollectionView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "contextDescriptor.numberOfFields">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "GridViewController.updateContentSize():CustomPinchCollectionView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "gridView.frame.size">
+               value = "view.bounds">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -173,44 +66,6 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "GridViewController.centerGridView():CustomPinchCollectionView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "scrollView.bounds.size">
-            </PersistentString>
-            <PersistentString
-               value = "scrollView.contentSize">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "static DMXChanel.deserialize(_:):SWXMLHashUsage.swift">
-      </ContextState>
-      <ContextState
-         contextName = "FixtureType.transfomrPatternModel():FixtureType+Transform.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "patternModel.modeChannel">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "__38-[MutableThreadTest mutableThreadTest]_block_invoke:MutableThreadTest.m">
-         <PersistentStrings>
-            <PersistentString
-               value = "[self.testArray mutableCopy]">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "GridViewController.scrollViewWillBeginZooming(_:with:):CustomPinchCollectionView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "scrollView.isZooming">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "SegmentMenu.scrollViewDidScroll(_:):ViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -218,6 +73,22 @@
             </PersistentString>
             <PersistentString
                value = "scrollView.contentOffset.x - scrollView.bounds.width">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TwoFingerScrollView.gestureRecognizer(_:shouldReceive:):backup.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "panGestureRecognizer">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "FixtureType.transfomrPatternModel():FixtureType+Transform.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "patternModel.modeChannel">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -236,13 +107,104 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "XMLImportViewController.documentPicker(_:didPickDocumentsAt:):XMLImportViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "url.lastPathComponent">
+            </PersistentString>
+            <PersistentString
+               value = "url.absoluteString">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TwoFingerScrollView.gestureRecognizer(_:shouldReceive:):CustomPinchCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "twoFingerPan">
+            </PersistentString>
+            <PersistentString
+               value = "isZooming">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "GridView.handlePanChanged(at:translation:):GridView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "layer.frame">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "FixtureType.mapChannelRelativeAndAbsolute(tempLogicalChannel:isFine:channelName:minValue:maxValue:):FixtureType+RelativeAndAbsolute.swift">
+      </ContextState>
+      <ContextState
+         contextName = "__38-[MutableThreadTest mutableThreadTest]_block_invoke:MutableThreadTest.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "[self.testArray mutableCopy]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "GridViewController.scrollViewDidZoom(_:):CustomPinchCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "scrollView.contentSize">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ContextDescriptorType.fieldOffsets.getter:ContextDescriptorType.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "contextDescriptor.numberOfFields">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "FixtureType.transfromChannelModel(tempDMXMode:):FixtureType+Transform.swift">
+      </ContextState>
+      <ContextState
+         contextName = "MetadataType.kind.getter:Metadata.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "UnsafePointer&lt;Int&gt;(pointer)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "FixtureType.transformSingleChannelModel(tempDMXChannel:):FixtureType+Transform.swift">
       </ContextState>
       <ContextState
-         contextName = "+[FLEXUtility appKeyWindow]:FLEXUtility.m">
+         contextName = "static FixtureType.deserialize(_:):SWXMLHashUsage.swift">
+      </ContextState>
+      <ContextState
+         contextName = "static DMXChanel.deserialize(_:):SWXMLHashUsage.swift">
+      </ContextState>
+      <ContextState
+         contextName = "SegmentMenu.shouldAddGradientLayer():ViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "UIApplication.sharedApplication.windows">
+               value = "scrollView.frame.width">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "static ChannelFunction.deserialize(_:):SWXMLHashUsage.swift">
+      </ContextState>
+      <ContextState
+         contextName = "SWXMLHashUsage.parseXML():SWXMLHashUsage.swift">
+      </ContextState>
+      <ContextState
+         contextName = "GridViewController.centerGridView():CustomPinchCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "scrollView.bounds.size">
+            </PersistentString>
+            <PersistentString
+               value = "scrollView.contentSize">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -255,13 +217,59 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "XMLImportViewController.documentPicker(_:didPickDocumentsAt:):XMLImportViewController.swift">
+         contextName = "+[FLEXUtility appKeyWindow]:FLEXUtility.m">
          <PersistentStrings>
             <PersistentString
-               value = "url.lastPathComponent">
+               value = "UIApplication.sharedApplication.windows">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "OptimizedGridView.createTextLayers(visableRect:):CustomPinchCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "visableRect.maxY">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "GridViewController.currentVisibleRect():CustomPinchCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "gridView.bounds">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "GridViewController.scrollViewWillBeginZooming(_:with:):CustomPinchCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "scrollView.isZooming">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TestGridViewController.scrollViewDidZoom(_:):backup.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "scrollView.zoomScale">
             </PersistentString>
             <PersistentString
-               value = "url.absoluteString">
+               value = "pinchCenterRatio">
+            </PersistentString>
+            <PersistentString
+               value = "scrollView.contentSize.width - scrollView.bounds.width">
+            </PersistentString>
+            <PersistentString
+               value = "pinchContentOffsetRatio">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "AdvancedCollectionView.handlePinch(_:):CustomPinchCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "currentScale">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

@@ -159,6 +159,12 @@ final class AULampLayoutLayer: CALayer {
         refresh()
     }
     
+    override init(layer: Any) {
+        super.init(layer: layer)
+        configUI()
+        refresh()
+    }
+    
     func configUI() {
         backgroundColor = GridConfig.itemBgColor.cgColor
         
