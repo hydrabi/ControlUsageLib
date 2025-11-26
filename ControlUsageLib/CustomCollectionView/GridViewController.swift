@@ -73,6 +73,8 @@ struct GridConfig {
 
 class GridViewController: UIViewController {
     
+    var viewModel = GridViewModel()
+    
     var scrollView: TwoFingerScrollView!
     
     /// 网格视图
@@ -82,14 +84,13 @@ class GridViewController: UIViewController {
         return view
     }()
     
-    /// 灯位图设备对象集合
-    private var lamps:[AULampLayout] = []
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
         navigationController?.navigationBar.isHidden = true
-        createFixtureLayoutOjects()
+        viewModel.createFixtureLayoutOjects()
         setupUI()
     }
     
@@ -122,13 +123,9 @@ class GridViewController: UIViewController {
         
         // 创建网格视图
         gridView.configureGrid(totalSize: GridConfig.gridMaxSize,
-                               layouts: lamps)
-        gridView.drawScaleAxisPath(rows: GridConfig.itemMaxRow,
-                                   columns: GridConfig.itemMaxColumn,
-                                   totalSize: GridConfig.gridMaxSize,
-                                   scale: scrollView.zoomScale)
-        
-        
+                               layouts: viewModel.lampLayouts,
+                               scale: scrollView.zoomScale)
+
         // 添加到 scrollView
         scrollView.addSubview(gridView)
         updateContentSize()
@@ -137,7 +134,8 @@ class GridViewController: UIViewController {
 //                                animated: false)
 //        //居中GridView
 //        centeredGridView()
-        createVisableLayers()
+        // 根据可视范围绘制虚线坐标轴或数字索引
+        getVisableRectRefreshLayers()
     }
 
     
@@ -150,8 +148,8 @@ class GridViewController: UIViewController {
         )
     }
     
-    /// 格局可视范围绘制坐标数字
-    func createVisableLayers() {
+    /// 根据可视范围绘制虚线坐标轴或数字索引
+    func getVisableRectRefreshLayers() {
         //获取可视范围
         let visableRect = currentVisibleRect()
         //根据可视范围绘制坐标
@@ -180,31 +178,7 @@ class GridViewController: UIViewController {
         scrollView.contentOffset = CGPoint(x: offsetX, y: offsetY)
     }
     
-    /// 创建临时设备对象
-    func createFixtureLayoutOjects() {
-        lamps.removeAll()
-        for i in 0..<20 {
-            let lamp = AULampLayout()
-            lamp.UUID = UUID().uuidString
-            lamp.position = i + 1
-            lamps.append(lamp)
-        }
-    }
+    
 }
 
-extension GridViewController:GridViewDelegate {
-    
-    func gridViewBeginPanLamp() {
-//        //拖动设备时 scrollview禁止拖动
-//        scrollView.isScrollEnabled = false
-//        scrollView.panGestureRecognizer.isEnabled = false
-//        scrollView.pinchGestureRecognizer?.isEnabled = false
-    }
-    
-    func gridViewEndPanLamp() {
-//        //结束拖动设备 scrollview恢复拖动
-//        scrollView.isScrollEnabled = true
-//        scrollView.panGestureRecognizer.isEnabled = true
-//        scrollView.pinchGestureRecognizer?.isEnabled = true
-    }
-}
+

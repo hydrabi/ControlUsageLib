@@ -69,6 +69,10 @@ extension GridView {
         
         if scale >= GridConfig.normalScale {
 
+            //如果要画正常大小的虚线坐标，则较小scale的图层需要移除
+            minScaleAxisLayer.removeFromSuperlayer()
+            minScaleBorderLayer.removeFromSuperlayer()
+            
             //通过可视范围计算
             let minRowNum = min(Int(floor(visableRect.minY / GridConfig.itemMaxHeight)),
                                 GridConfig.itemMaxRow)

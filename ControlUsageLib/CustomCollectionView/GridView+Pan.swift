@@ -18,14 +18,10 @@ extension GridView {
         switch gesture.state {
         case .began:
             handlePanBegan(at: location)
-            //scrollview的pan禁用
-            delegate?.gridViewBeginPanLamp()
         case .changed:
             handlePanChanged(at: location, translation: gesture.translation(in: self))
         case .ended, .cancelled:
             handlePanEnded(at: location, translation: gesture.translation(in: self))
-            //scrollview的pan恢复
-            delegate?.gridViewEndPanLamp()
         default:
             break
         }
@@ -237,6 +233,7 @@ extension GridView {
         return (predictedFrames,canMove)
     }
     
+    /// 创建预测位置图层
     func createPanPredictedLayers() {
         removeAllPanPredictedLayers()
         for _ in draggingLayers {
@@ -244,11 +241,17 @@ extension GridView {
             layer.lineWidth = 2
             layer.strokeColor = GridConfig.itemSelectedBorderColor.cgColor
             layer.fillColor = UIColor.clear.cgColor
-            layer.lineDashPattern = [4]
+            if self.scale >= GridConfig.normalScale {
+                layer.lineDashPattern = [4]
+            }
             panPredictedLayers.append(layer)
         }
     }
     
+    /// 更新预测位置图层参数
+    /// - Parameters:
+    ///   - predictedFrames: 预测位置图层参数
+    ///   - canMove: 最终是否能够移动
     func updatePanPredictedLayers(predictedFrames:[(targetPosition:Int,frame:CGRect)],canMove:Bool) {
         let minIndex = getLayersMinZIndex(layers: draggingLayers.map({ $0.layer }))
         for (index,layer) in panPredictedLayers.enumerated() {
@@ -277,6 +280,7 @@ extension GridView {
         }
     }
     
+    /// 移除所有预测位置图层
     func removeAllPanPredictedLayers() {
         panPredictedLayers.forEach { $0.removeFromSuperlayer() }
         panPredictedLayers.removeAll()

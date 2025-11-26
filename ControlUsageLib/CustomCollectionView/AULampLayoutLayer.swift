@@ -46,19 +46,33 @@ final class AULampLayout: NSObject {
     
     /// 选中数字
     var selectedNum:Int = 1
+    
+    /// 背景颜色
+    var color:UIColor = GridConfig.itemBgColor
+}
+
+/// 灯位图设备图层状态
+enum AULampLyoutStatus:Int {
+    //正常大小
+    case normal
+    //缩小到一定比例的大小
+    case small
 }
 
 /// 灯位图设备图层
 final class AULampLayoutLayer: CALayer {
     
     /// 单个设备layout最大宽度
-    let itemWidth:CGFloat = 100
+    let itemWidth:CGFloat = GridConfig.itemMaxWidth
     
     /// 单个设备layout最大高度
-    let itemHeight:CGFloat = 100
+    let itemHeight:CGFloat = GridConfig.itemMaxHeight
     
     /// 对应的灯位图设备对象
     var lamp:AULampLayout = AULampLayout()
+    
+    /// 灯位图设备图层状态
+    var status:AULampLyoutStatus = .normal
     
     //图层
     lazy var iconLayer:CALayer = {
@@ -128,6 +142,9 @@ final class AULampLayoutLayer: CALayer {
         let layer = CATextLayer()
         layer.contentsScale = UIScreen.main.scale
         layer.alignmentMode = .right
+        layer.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        layer.fontSize = 12
+        layer.foregroundColor = RGB(r: 70, g: 170, b: 95).cgColor
         return layer
     }()
     
@@ -140,34 +157,95 @@ final class AULampLayoutLayer: CALayer {
         return layer
     }()
     
-    init(lamp:AULampLayout) {
+    /// 背景颜色图层
+    lazy var colorLayer:CALayer = {
+        let layer = CAShapeLayer()
+        layer.backgroundColor = GridConfig.itemBgColor.cgColor
+        return layer
+    }()
+    
+    /// scale较小时的图层
+    lazy var smallNumLayer:CATextLayer = {
+        let layer = CATextLayer()
+        layer.contentsScale = UIScreen.main.scale
+        layer.alignmentMode = .center
+        layer.font = UIFont.systemFont(ofSize: 50, weight: .bold)
+        layer.fontSize = 50
+        layer.foregroundColor = RGB(r: 70, g: 170, b: 95).cgColor
+        return layer
+    }()
+    
+    init(lamp:AULampLayout,status:AULampLyoutStatus) {
         self.lamp = lamp
+        self.status = status
         super.init()
         configUI()
-        refresh()
     }
     
     override init() {
         super.init()
         configUI()
-        refresh()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         configUI()
-        refresh()
     }
     
     override init(layer: Any) {
         super.init(layer: layer)
         configUI()
-        refresh()
     }
     
     func configUI() {
-        backgroundColor = GridConfig.itemBgColor.cgColor
-        
+        if status == .normal {
+            configNormalUI()
+            refreshNormalUI()
+        }
+        else {
+            configSmallUI()
+            refreshSmallUI()
+        }
+    }
+    
+    /// 刷新边框
+    func refreshBorder() {
+        if lamp.isSelected {
+            borderLayer.strokeColor = GridConfig.itemSelectedBorderColor.cgColor
+        }
+        else {
+            borderLayer.strokeColor = GridConfig.itemBorderColor.cgColor
+        }
+    }
+    
+    /// 点击操作
+    func refreshUI() {
+        if status == .normal {
+            refreshNormalUI()
+        }
+        else {
+            refreshSmallUI()
+        }
+    }
+    
+    /// 通过序号计算行、列
+    /// - Returns: 行、列组成的元组
+    func numToRowColumn() -> (row:Int,column:Int) {
+        //序号从1开始 行列从0开始
+        let row = (lamp.position - 1) / GridConfig.itemMaxColumn
+        let column = (lamp.position - 1)  % GridConfig.itemMaxColumn
+        return (row,column)
+    }
+    
+}
+
+//MARK: - 正常大小的UI
+extension AULampLayoutLayer {
+    
+    /// 配置正常大小的UI
+    func configNormalUI() {
+
+        addSublayer(colorLayer)
         addSublayer(iconLayer)
         addSublayer(numLayer)
         addSublayer(statusLayer)
@@ -181,6 +259,9 @@ final class AULampLayoutLayer: CALayer {
         let iconWH:CGFloat = 34
         let statusWH:CGFloat = 10
         let selectedNumWH:CGFloat = 15
+        
+        //背景颜色
+        colorLayer.frame = CGRect(x: 0, y: 0, width: itemWidth, height: itemHeight)
         
         //图标
         iconLayer.frame = CGRect(x: leading,
@@ -212,6 +293,12 @@ final class AULampLayoutLayer: CALayer {
                                      width: itemWidth - leading * 2 - selectedNumWH,
                                      height: 13)
         
+        //选中数字
+        selectedNumLayer.frame = CGRect(x: itemWidth - selectedNumWH - leading,
+                                        y: itemWidth - selectedNumWH - leading,
+                                        width: selectedNumWH,
+                                        height: selectedNumWH)
+        
         //设置边框
         let borderPath = UIBezierPath(rect: CGRect(x: 0,
                                                    y: 0,
@@ -220,10 +307,13 @@ final class AULampLayoutLayer: CALayer {
         borderLayer.path = borderPath.cgPath
     }
     
-    func refresh() {
+    /// 刷新正常大小参数
+    func refreshNormalUI() {
         let leading:CGFloat = 10
-        let selectedNumWH:CGFloat = 15
 
+        //背景颜色
+        colorLayer.backgroundColor = lamp.color.cgColor
+        
         //数字
         numLayer.string = "\(lamp.position)"
         
@@ -247,43 +337,57 @@ final class AULampLayoutLayer: CALayer {
         universeLayer.string = "Universe:A/1"
         
         //选中数字
-        selectedNumLayer.frame = CGRect(x: itemWidth - selectedNumWH - leading,
-                                        y: itemWidth - selectedNumWH - leading,
-                                        width: selectedNumWH,
-                                        height: selectedNumWH)
-        let selectedNumAttributeString = NSMutableAttributedString(string: "1")
-        selectedNumAttributeString.addAttribute(.foregroundColor, value: RGB(r: 70, g: 170, b: 95),
-                                             range: NSMakeRange(0, selectedNumAttributeString.length))
-        selectedNumAttributeString.addAttribute(.font,
-                                                value: UIFont.systemFont(ofSize: 12, weight: .medium),
-                                             range: NSMakeRange(0, selectedNumAttributeString.length))
-        selectedNumLayer.string = selectedNumAttributeString
-    }
-    
-    /// 刷新边框
-    func refreshBorder() {
         if lamp.isSelected {
-            borderLayer.strokeColor = GridConfig.itemSelectedBorderColor.cgColor
+            selectedNumLayer.string = "\(lamp.selectedNum)"
         }
         else {
-            borderLayer.strokeColor = GridConfig.itemBorderColor.cgColor
+            selectedNumLayer.string = ""
         }
-    }
-    
-    /// 点击操作
-    func tapAction() {
-        lamp.isSelected = !lamp.isSelected
+        
         refreshBorder()
     }
+}
+
+//MARK: - 比例较小的UI
+extension AULampLayoutLayer {
     
-    /// 通过序号计算行、列
-    /// - Returns: 行、列组成的元组
-    func numToRowColumn() -> (row:Int,column:Int) {
-        //序号从1开始 行列从0开始
-        let row = (lamp.position - 1) / GridConfig.itemMaxColumn
-        let column = (lamp.position - 1)  % GridConfig.itemMaxColumn
-        return (row,column)
+    /// 配置scale较小的UI
+    func configSmallUI() {
+        addSublayer(colorLayer)
+        addSublayer(smallNumLayer)
+        addSublayer(borderLayer)
+        
+        //背景颜色
+        colorLayer.frame = CGRect(x: 0, y: 0, width: itemWidth, height: itemHeight)
+
+        //设置边框
+        let borderPath = UIBezierPath(rect: CGRect(x: 0,
+                                                   y: 0,
+                                                   width: itemWidth,
+                                                   height: itemHeight))
+        borderLayer.path = borderPath.cgPath
     }
     
-    
+    /// 刷新scale较小的UI
+    func refreshSmallUI() {
+        
+        //背景颜色
+        colorLayer.backgroundColor = lamp.color.cgColor
+        
+        if lamp.isSelected {
+            //选中数字
+            smallNumLayer.string = "\(lamp.selectedNum)"
+        }
+        else {
+            smallNumLayer.string = ""
+        }
+        
+        //将数字垂直居中
+        let textSize = smallNumLayer.preferredFrameSize()
+        smallNumLayer.frame = CGRect(x: 0, y: (itemHeight - textSize.height) / 2,
+                                     width: itemWidth,
+                                     height: textSize.height)
+        
+        refreshBorder()
+    }
 }

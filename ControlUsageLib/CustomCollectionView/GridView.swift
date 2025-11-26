@@ -37,13 +37,31 @@ final class TwoFingerScrollView:UIScrollView,UIGestureRecognizerDelegate {
     
 }
 
-protocol GridViewDelegate:AnyObject {
-    func gridViewBeginPanLamp()
-    func gridViewEndPanLamp()
-}
+
 
 /// 自定义网格图
 final class GridView:UIView {
+
+    // 使用 CALayer 来提高性能
+    var numsLayers: [CALayer] = []
+    
+    // scale较低时的CAShapeLayer网格实现
+    var minScaleAxisLayer:CAShapeLayer = CAShapeLayer()
+    
+    // scale较低时的CAShapeLayer边界分区线条实现
+    var minScaleBorderLayer:CAShapeLayer = CAShapeLayer()
+    
+//    // scale最大时的CAShapeLayer边界分区线条实现
+//    var maxScaleAxisLayer:CAShapeLayer = CAShapeLayer()
+    
+    // 设备图层
+    var lampLayers:[AULampLayoutLayer] = []
+    
+    /// 正常scale时虚线图层
+    var maxScaleDeshLayers:[CAShapeLayer] = []
+    
+    //当前scale
+    private(set) var scale:CGFloat = 0
     
     /// 是否应该绘制坐标数字
     var shouldDrawNum:Bool {
@@ -59,25 +77,8 @@ final class GridView:UIView {
         }
     }
     
-    // 使用 CALayer 来提高性能
-    var numsLayers: [CALayer] = []
-    
-    // scale较低时的CAShapeLayer网格实现
-    var minScaleAxisLayer:CAShapeLayer = CAShapeLayer()
-    
-    // scale较低时的CAShapeLayer边界分区线条实现
-    var minScaleBorderLayer:CAShapeLayer = CAShapeLayer()
-    
-    // scale最大时的CAShapeLayer边界分区线条实现
-    var maxScaleAxisLayer:CAShapeLayer = CAShapeLayer()
-    
-    // 设备图层
-    var lampLayers:[AULampLayoutLayer] = []
-    
-    var maxScaleDeshLayers:[CAShapeLayer] = []
-    
-    //当前scale
-    var scale:CGFloat = 0
+    /// 灯位图设备大小状态
+    var lampLayoutStatus:AULampLyoutStatus = .normal
     
     //当前选中的设备
     private var selectedLampLayer:AULampLayoutLayer?
@@ -124,215 +125,46 @@ final class GridView:UIView {
     }
     
     func configureGrid(totalSize: CGSize,
-                       layouts:[AULampLayout]) {
+                       layouts:[AULampLayout],
+                       scale:CGFloat = 1) {
         // 设置视图的frame
         self.frame = CGRect(x: 0,
                             y: 0,
                             width: totalSize.width,
                             height: totalSize.height)
         self.backgroundColor = .black
+        //初始化当前scale
+        self.scale = scale
         //创建设备图层
-        createFixtureLayers(layouts: layouts)
+        recreateFixtureLayers(layouts: layouts,scale: scale)
     }
-    /// 绘制网格图层
-    /// - Parameters:
-    ///   - rows: 行
-    ///   - columns: 列
-    ///   - totalSize: 总宽高
-    ///   - scale: 当前scrollview比例
-    func drawScaleAxisPath(rows:Int,columns:Int,totalSize:CGSize,scale:CGFloat = 1) {
-        guard self.scale != scale else {return}
+    
+    /// 修改当前scale 部分重绘需根据scale变化执行
+    /// - Parameter scale: 当前scale
+    /// - Parameter layouts: 设备图层
+    func resetScale(scale:CGFloat,
+                    layouts:[AULampLayout]) {
         
-        minScaleAxisLayer.removeFromSuperlayer()
-        minScaleBorderLayer.removeFromSuperlayer()
-        maxScaleAxisLayer.removeFromSuperlayer()
-        
-        if scale >= GridConfig.normalScale {
-//            drawMaxScaleAxisPath(rows: rows, columns: columns, totalSize: totalSize)
+        //当前scale变化且少于正常大小才绘制坐标轴
+        if self.scale != scale && scale < GridConfig.normalScale {
+            drawMinScaleAxisPath(rows: GridConfig.itemMaxRow,
+                                 columns: GridConfig.itemMaxColumn,
+                                 totalSize: GridConfig.gridMaxSize,
+                                 scale:scale)
         }
-        else {
-            drawMinScaleAxisPath(rows: rows, columns: columns, totalSize: totalSize,scale:scale)
+        
+        //新的灯位图设备大小状态
+        let newlampLayoutStatus:AULampLyoutStatus = scale >= GridConfig.gridShouldDrawFixtureScale ? .normal : .small
+        //如果灯位图大小状态与之前不同
+        if self.lampLayoutStatus != newlampLayoutStatus {
+            //重新根据当前scale创建设备图层
+            recreateFixtureLayers(layouts: layouts,scale: scale)
         }
         
         self.scale = scale
+        self.lampLayoutStatus = newlampLayoutStatus
     }
     
-    /// 绘制scale较小是的网格图层
-    /// - Parameters:
-    ///   - rows: 行
-    ///   - columns: 列
-    ///   - totalSize: 宽高
-    func drawMinScaleAxisPath(rows: Int, columns: Int, totalSize: CGSize,scale:CGFloat = 1) {
-        minScaleAxisLayer.removeFromSuperlayer()
-        minScaleBorderLayer.removeFromSuperlayer()
-        maxScaleAxisLayer.removeFromSuperlayer()
-        
-        //根据缩放scale重新计算lineWidth 防止缩放时线条变模糊
-        let baseLineWidth:CGFloat = 1 / scale
-        let baseBorderLineWidth:CGFloat = 2 / scale
-        
-        
-        let path = UIBezierPath()
-        
-        // 计算每个方格的大小
-        let cellWidth:CGFloat = totalSize.width / CGFloat(columns)
-        let cellHeight:CGFloat = totalSize.height / CGFloat(rows)
-        for i in 0...rows {
-            path.move(to: CGPoint(x:0, y: cellHeight * CGFloat(i)))
-            path.addLine(to: CGPoint(x: totalSize.width, y: cellHeight * CGFloat(i)))
-        }
-        
-        for i in 0...columns {
-            path.move(to: CGPoint(x: cellWidth * CGFloat(i), y: 0))
-            path.addLine(to: CGPoint(x: cellWidth * CGFloat(i), y: totalSize.height))
-        }
-        
-        minScaleAxisLayer.path = path.cgPath
-        minScaleAxisLayer.lineWidth = baseLineWidth
-        minScaleAxisLayer.strokeColor = RGB(r: 179, g: 179, b: 179).cgColor
-        minScaleAxisLayer.fillColor = UIColor.clear.cgColor
-        self.layer.insertSublayer(minScaleAxisLayer,at: 0)
-        
-        let borderPath = UIBezierPath(roundedRect: CGRect(x: 0,
-                                                                  y: 0,
-                                                          width: totalSize.width,
-                                                          height: totalSize.height),
-                                      cornerRadius: 2.5)
-        //分成4*4大块
-        for i in 1..<4 {
-            //画4*4分区的横线
-            borderPath.move(to: CGPoint(x: 0,
-                                                y: totalSize.height / CGFloat(4) * CGFloat(i)))
-            borderPath.addLine(to: CGPoint(x: totalSize.width,
-                                                   y: totalSize.height / CGFloat(4) * CGFloat(i)))
-            //画4*4分区的竖线
-            borderPath.move(to: CGPoint(x: totalSize.width / CGFloat(4) * CGFloat(i),
-                                                y: 0))
-            borderPath.addLine(to: CGPoint(x: totalSize.width / CGFloat(4) * CGFloat(i),
-                                                   y: totalSize.height))
-        }
-        
-        minScaleBorderLayer.path = borderPath.cgPath
-        minScaleBorderLayer.lineWidth = baseBorderLineWidth
-        minScaleBorderLayer.fillColor = UIColor.clear.cgColor
-        minScaleBorderLayer.strokeColor = RGB(r: 179, g: 179, b: 179).cgColor
-        self.layer.insertSublayer(minScaleBorderLayer, above: minScaleAxisLayer)
-    }
-    
-//    /// 绘制网格图层
-//    /// - Parameters:
-//    ///   - rows: 行
-//    ///   - columns: 列
-//    ///   - totalSize: 宽高
-//    func drawMaxScaleAxisPath(rows: Int, columns: Int, totalSize: CGSize) {
-//        
-//        let path = UIBezierPath()
-//        
-//        // 计算每个方格的大小
-//        let cellWidth:CGFloat = totalSize.width / CGFloat(columns)
-//        let cellHeight:CGFloat = totalSize.height / CGFloat(rows)
-//        //画行
-//        for i in 0...rows {
-//            path.move(to: CGPoint(x:0, y: cellHeight * CGFloat(i)))
-//            path.addLine(to: CGPoint(x: totalSize.width, y: cellHeight * CGFloat(i)))
-//        }
-//        
-//        //画列
-//        for i in 0...columns {
-//            path.move(to: CGPoint(x: cellWidth * CGFloat(i), y: 0))
-//            path.addLine(to: CGPoint(x: cellWidth * CGFloat(i), y: totalSize.height))
-//        }
-//        
-//        maxScaleAxisLayer.path = path.cgPath
-//        maxScaleAxisLayer.lineJoin = .round
-//        maxScaleAxisLayer.lineDashPattern = [4]
-//        maxScaleAxisLayer.lineWidth = 1.0
-//        maxScaleAxisLayer.strokeColor = RGB(r: 179, g: 179, b: 179).cgColor
-//        // 性能优化设置
-//        maxScaleAxisLayer.shouldRasterize = true
-//        maxScaleAxisLayer.rasterizationScale = UIScreen.main.scale
-//        maxScaleAxisLayer.drawsAsynchronously = true
-//        self.layer.insertSublayer(maxScaleAxisLayer, at: 0)
-//    }
-    
-    
-    
-    //创建设备图层
-    func createFixtureLayers(layouts:[AULampLayout]) {
-        lampLayers.forEach { $0.removeFromSuperlayer() }
-        lampLayers.removeAll()
-        
-        for lamp in layouts {
-            let lampLayer = AULampLayoutLayer(lamp: lamp)
-            lampLayers.append(lampLayer)
-        }
-    }
-    
-    //设备图层添加
-    func addFixtureLayers(visableRect:CGRect) {
-        guard !visableRect.origin.x.isInfinite && !visableRect.origin.y.isInfinite else {
-            return
-        }
-        
-        if shouldDrawFixture {
-            //通过可视范围计算行、列范围
-            let minRowNum = min(Int(floor(visableRect.minY / GridConfig.itemMaxHeight)),
-                                GridConfig.itemMaxRow)
-            let maxRowNum = min(Int(ceil(visableRect.maxY / GridConfig.itemMaxHeight)),
-                                GridConfig.itemMaxRow)
-            let minColumnNum = min(Int(floor(visableRect.minX / GridConfig.itemMaxWidth)),
-                                   GridConfig.itemMaxColumn)
-            let maxColumnNum = min(Int(ceil(visableRect.maxX / GridConfig.itemMaxWidth)),
-                                   GridConfig.itemMaxColumn)
-            
-            //已经添加了的设备图层
-            let addedLayers = lampLayers.filter { $0.superlayer != nil }
-            //仍未添加的设备图层
-            let unAddedLayers = lampLayers.filter { $0.superlayer == nil }
-            //选中的图层
-            let selectedLayers = lampLayers.filter { $0.lamp.isSelected }
-            
-            //已经添加的图层已经不在可视范围内 移除
-            for layer in addedLayers {
-                let (row,column) = layer.numToRowColumn()
-                if row < minRowNum || row > maxRowNum || column < minColumnNum || column > maxColumnNum {
-                    layer.removeFromSuperlayer()
-                }
-                else {
-                    //否则将图层移到最顶点
-                    layer.removeFromSuperlayer()
-                    self.layer.addSublayer(layer)
-                }
-            }
-            
-            //未添加的图层在可视范围内 添加
-            for layer in unAddedLayers {
-                let (row,column) = layer.numToRowColumn()
-                if (row >= minRowNum && row <= maxRowNum) && (column >= minColumnNum && column <= maxColumnNum) {
-                    self.layer.addSublayer(layer)
-                    let x = CGFloat(column) * GridConfig.itemMaxWidth
-                    let y = CGFloat(row) * GridConfig.itemMaxHeight
-                    layer.frame = CGRect(x: x,
-                                         y: y,
-                                         width: GridConfig.itemMaxWidth,
-                                         height: GridConfig.itemMaxHeight)
-                }
-            }
-            
-            //拖动图层在最顶层
-            for layer in selectedLayers {
-                if layer.superlayer != nil {
-                    //将图层移到最顶点
-                    layer.removeFromSuperlayer()
-                    self.layer.addSublayer(layer)
-                }
-            }
-        }
-        else {
-            // 清除旧图层
-            lampLayers.forEach { $0.removeFromSuperlayer() }
-        }
-    }
 }
 
 extension GridView:UIGestureRecognizerDelegate {
@@ -345,37 +177,7 @@ extension GridView:UIGestureRecognizerDelegate {
     }
 }
 
-//MARK: - 点击手势
-extension GridView {
-    
-    /// 点击手势响应事件
-    /// - Parameter gesture: 点击手势
-    @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
-        let tapPoint = gesture.location(in: self)
-        guard let lampLayer = lampLayers.first(where: { $0.superlayer != nil && $0.frame.contains(tapPoint) }) else { return }
-        // 点击空白区域时还原选中
-        lampLayer.tapAction()
-        
-        //选中的图层摆在最上面
-        if lampLayer.lamp.isSelected {
-            lampLayer.removeFromSuperlayer()
-            self.layer.addSublayer(lampLayer)
-        }
-        //反选的图层居于其它设备图层之下
-        else {
-            //两边的设备如果是选中状态
-            let aboveLayers = lampLayers.filter { temp in
-                temp.lamp.isSelected &&
-                (temp.lamp.position == lampLayer.lamp.position - 1 || temp.lamp.position == lampLayer.lamp.position + 1)
-            }
-            //将其图层至于反选的设备图层之上
-            aboveLayers.forEach { temp in
-                temp.removeFromSuperlayer()
-                self.layer.insertSublayer(temp, above: lampLayer)
-            }
-        }
-    }
-}
+
 
 extension GridView {
     
