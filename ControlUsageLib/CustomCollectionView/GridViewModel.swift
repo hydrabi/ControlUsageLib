@@ -6,7 +6,7 @@
 
 
 import Foundation
-
+//1
 final class GridViewModel {
     
     /// 灯位图设备对象集合
