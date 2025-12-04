@@ -10,6 +10,7 @@
 		023670302ED69A4E0036C625 /* GridView+Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0236702F2ED69A4E0036C625 /* GridView+Fixture.swift */; };
 		023670322ED69F270036C625 /* GridView+Axis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023670312ED69F270036C625 /* GridView+Axis.swift */; };
 		023670342ED6D18C0036C625 /* GridViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023670332ED6D18C0036C625 /* GridViewModel.swift */; };
+		023670362ED707D80036C625 /* GridSubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023670352ED707D80036C625 /* GridSubView.swift */; };
 		023AE7C22E32605800A92421 /* CombindLearn+Control.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023AE7C12E32605800A92421 /* CombindLearn+Control.swift */; };
 		02466D732ED5ABD50084819A /* GridView+Pan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02466D722ED5ABD50084819A /* GridView+Pan.swift */; };
 		02466D752ED5DA7A0084819A /* GridView+Visable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02466D742ED5DA7A0084819A /* GridView+Visable.swift */; };
@@ -53,6 +54,7 @@
 		0236702F2ED69A4E0036C625 /* GridView+Fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GridView+Fixture.swift"; sourceTree = "<group>"; };
 		023670312ED69F270036C625 /* GridView+Axis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GridView+Axis.swift"; sourceTree = "<group>"; };
 		023670332ED6D18C0036C625 /* GridViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridViewModel.swift; sourceTree = "<group>"; };
+		023670352ED707D80036C625 /* GridSubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridSubView.swift; sourceTree = "<group>"; };
 		023AE7C12E32605800A92421 /* CombindLearn+Control.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CombindLearn+Control.swift"; sourceTree = "<group>"; };
 		02466D722ED5ABD50084819A /* GridView+Pan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GridView+Pan.swift"; sourceTree = "<group>"; };
 		02466D742ED5DA7A0084819A /* GridView+Visable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GridView+Visable.swift"; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				02E61D4A2ED03A7300083A5A /* AULampLayoutLayer.swift */,
+				023670352ED707D80036C625 /* GridSubView.swift */,
 				0257ED232ED43B6B004C0399 /* GridView.swift */,
 				023670312ED69F270036C625 /* GridView+Axis.swift */,
 				0236702F2ED69A4E0036C625 /* GridView+Fixture.swift */,
@@ -494,6 +497,7 @@
 				02747ED02BC7929100D74A35 /* HandyJsonUsage.swift in Sources */,
 				02B9B3522BD67DFB006FBFDC /* PromiseLearn.swift in Sources */,
 				02EF34692B944BC000E1D84B /* UITableViewCell+RxSwift.swift in Sources */,
+				023670362ED707D80036C625 /* GridSubView.swift in Sources */,
 				02CBB2482BD0C4B90004EFDC /* FixtureType+RelativeAndAbsolute.swift in Sources */,
 				029CF7082B39B76800153685 /* UILable+AttributeText.swift in Sources */,
 				023AE7C22E32605800A92421 /* CombindLearn+Control.swift in Sources */,

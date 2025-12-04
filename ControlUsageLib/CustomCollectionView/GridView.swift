@@ -7,37 +7,15 @@
 
 import Foundation
 
-/// 二指滑动scrollview
-final class TwoFingerScrollView:UIScrollView,UIGestureRecognizerDelegate {
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupTwoFingerScroll()
-    }
 
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setupTwoFingerScroll()
-    }
-
-    private func setupTwoFingerScroll() {
-        for gesture in gestureRecognizers ?? [] {
-            //滑动手势最小手指数改成2
-            if let pan = gesture as? UIPanGestureRecognizer {
-                pan.minimumNumberOfTouches = 2
-                pan.maximumNumberOfTouches = 2
-            }
-        }
-    }
-
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
-                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return false
-    }
-    
+//GridView拖动手势触发操作
+enum AUGridViewPanMode {
+    //拖动选中设备图层
+    case draggingLayer
+    //框选设备图层
+    case selectionBox
 }
-
-
 
 /// 自定义网格图
 final class GridView:UIView {
@@ -50,9 +28,6 @@ final class GridView:UIView {
     
     // scale较低时的CAShapeLayer边界分区线条实现
     var minScaleBorderLayer:CAShapeLayer = CAShapeLayer()
-    
-//    // scale最大时的CAShapeLayer边界分区线条实现
-//    var maxScaleAxisLayer:CAShapeLayer = CAShapeLayer()
     
     // 设备图层
     var lampLayers:[AULampLayoutLayer] = []
@@ -102,6 +77,16 @@ final class GridView:UIView {
     
     /// 拖动开始后预测落点的虚线图层
     var panPredictedLayers:[CAShapeLayer] = []
+    
+    /// 拖动手势对应的模式
+    var panMode:AUGridViewPanMode = .draggingLayer
+    
+    /// 拖动起始点
+    var panStartLocation:CGPoint = .zero
+    
+    /// 框选图层
+//    var panSelectionBoxLayer:CAShapeLayer? = nil
+    var panSelectionBoxLayer:AUGridViewSelectionBoxLayer? = nil
     
     /// 外部委托
     weak var delegate:GridViewDelegate?

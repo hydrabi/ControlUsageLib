@@ -13,7 +13,11 @@ protocol GridViewDelegate:AnyObject {
     
     /// 点击某个灯位图设备回调
     /// - Parameter lampLayout: 点击的灯位图设备对象
-    func gridViewDidTapLampLayout(lampLayout:AULampLayout)
+    /// - Parameter fource: 是否强制选中
+    /// - Parameter isSelected:fource为true的前提下，是否被选中
+    func gridViewDidTapLampLayout(lampLayout:AULampLayout,
+                                  fource:Bool,
+                                  isSelected:Bool)
 }
 
 // MARK: - UIScrollViewDelegate
@@ -71,7 +75,11 @@ extension GridViewController:GridViewDelegate {
     }
     
     // 点击某个灯位图设备回调
-    func gridViewDidTapLampLayout(lampLayout: AULampLayout) {
-        viewModel.tapLampLayout(lampLayout: lampLayout)
+    func gridViewDidTapLampLayout(lampLayout: AULampLayout,
+                                  fource:Bool,
+                                  isSelected:Bool) {
+        viewModel.tapLampLayout(lampLayout: lampLayout,
+                                fource: fource,
+                                isSelected: isSelected)
     }
 }

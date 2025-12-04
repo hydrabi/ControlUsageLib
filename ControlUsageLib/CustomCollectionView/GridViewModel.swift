@@ -31,8 +31,20 @@ final class GridViewModel {
     
     /// 点击灯位图设备
     /// - Parameter lampLayout: 灯位图设备对象
-    func tapLampLayout(lampLayout:AULampLayout) {
-        lampLayout.isSelected = !lampLayout.isSelected
+    /// - Parameter fource: 是否外部强制设置选中状态
+    /// - Parameter isSelected: fouce为true时，设置是否被选中
+    func tapLampLayout(lampLayout:AULampLayout,
+                       fource:Bool = false,
+                       isSelected:Bool = false) {
+        //如果外部强制选择
+        if fource {
+            lampLayout.isSelected = isSelected
+        }
+        //切换
+        else {
+            lampLayout.isSelected.toggle()
+        }
+        
         //被选中
         if lampLayout.isSelected {
             if !selectedLampLayouts.contains(where: { $0.UUID == lampLayout.UUID }) {
