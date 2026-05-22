@@ -8,14 +8,6 @@
 import UIKit
 import SnapKit
 
-extension String {
-    /// 计算文本长度
-    func widthFor(font: UIFont, height: CGFloat = 20) -> CGFloat {
-        let rect = NSString(string: self).boundingRect(with: CGSize(width: CGFloat(MAXFLOAT), height: height), options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
-        return ceil(rect.width)
-    }
-}
-
 extension Array{
     
     /// 去除重复元素
@@ -80,9 +72,6 @@ class ViewController: UIViewController {
     
     var fetch:FetchDemo? = nil
     
-    lazy var gridView:GridView = {
-        return GridView(frame: .zero)
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -96,10 +85,6 @@ class ViewController: UIViewController {
         fetch = FetchDemo()
         fetch?.startFetchAllData()
         
-        view.addSubview(gridView)
-        gridView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
     }
 
 
