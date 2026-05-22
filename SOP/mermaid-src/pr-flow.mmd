@@ -1,0 +1,14 @@
+flowchart TD
+    A[实现完成] --> B[requesting-code-review task 级审查]
+    B --> C[verification-before-completion]
+    C --> D[openspec-verify]
+    D --> E[finishing-a-development-branch]
+    E --> F{四选一}
+    F -->|Option 1| G[本地 merge]
+    F -->|Option 2| H[push + gh pr create]
+    F -->|Option 3| I[保持分支]
+    F -->|Option 4| J[丢弃需确认]
+    H --> K[可选 babysit PR]
+    G --> L[PR merge 或本地合入后]
+    K --> L
+    L --> M[openspec-archive]

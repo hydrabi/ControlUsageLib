@@ -1,0 +1,15 @@
+flowchart TD
+    A[模糊需求] --> B{需要深度探索?}
+    B -->|是| C[openspec-explore 或 brainstorming]
+    B -->|否| D[openspec-propose]
+    C --> D
+    D --> E[proposal + design + specs + tasks.md]
+    E --> F{tasks 够细?}
+    F -->|小改动| G[openspec-apply 直接做]
+    F -->|复杂/跨模块| H[writing-plans 展开 tasks]
+    H --> I[git worktree 隔离]
+    I --> J[executing-plans / subagent-driven]
+    G --> K[verification-before-completion]
+    J --> K
+    K --> L[openspec-verify]
+    L --> M[openspec-archive]
