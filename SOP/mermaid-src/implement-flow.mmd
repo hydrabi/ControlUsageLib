@@ -1,0 +1,12 @@
+flowchart TD
+    A[openspec-propose artifacts 就绪] --> B[writing-plans 展开 tasks.md]
+    B --> C{需要隔离?}
+    C -->|是| D[using-git-worktrees]
+    C -->|否| E[executing-plans]
+    D --> E
+    E --> F[subagent-driven 可选]
+    F --> G[同步勾选 tasks.md]
+    E --> G
+    G --> H[verification-before-completion]
+    H --> I[openspec-verify]
+    I --> J[openspec-archive]
