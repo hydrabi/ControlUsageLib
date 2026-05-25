@@ -84,7 +84,10 @@ class ViewController: UIViewController {
         
         fetch = FetchDemo()
         fetch?.startFetchAllData()
-        
+        // 以下为原调试代码，编译期常量除零会报错 division by zero，故注释保留说明、不参与编译：
+//        let temp1 = 1
+//        let temp2 = 0
+//        let temp3 = temp1 / temp2
     }
 
 
