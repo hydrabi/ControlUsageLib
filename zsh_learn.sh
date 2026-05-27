@@ -1,26 +1,26 @@
 #!/bin/zsh
 # cat /Users/bizhifeng/Documents/code/Shell/a.txt >> /Users/bizhifeng/Documents/code/Shell/b.txt
 #(())用于比较数值
-num=1234
-((num == 123)) && echo good
-#(( 里边可以使用与（&&）或（||）非（!）操作符
-((num == 1 || num == 123)) && echo "或"
-#大于等于
-((num >= 123)) && echo "大于等于"
-#小于
-((num < 124)) && echo "小于"
-if ((num > 3 && num + 3 < 10)) {
-    echo $num
-} elif ((num == 123)) {
-    echo "num=123"
-} else {
-    echo "num不等于123"
-}
-#[[ ]] 用于比较字符串、判断文件等
-str="abc"
-if [[ "$str" == "abc" || "$str" == "value" ]] { 
-    echo "$str" 
-}
+#num=1234
+#((num == 123)) && echo good
+##(( 里边可以使用与（&&）或（||）非（!）操作符
+#((num == 1 || num == 123)) && echo "或"
+##大于等于
+#((num >= 123)) && echo "大于等于"
+##小于
+#((num < 124)) && echo "小于"
+#if ((num > 3 && num + 3 < 10)) {
+#    echo $num
+#} elif ((num == 123)) {
+#    echo "num=123"
+#} else {
+#    echo "num不等于123"
+#}
+##[[ ]] 用于比较字符串、判断文件等
+#str="abc"
+#if [[ "$str" == "abc" || "$str" == "value" ]] { 
+#    echo "$str" 
+#}
 # for 循环主要用于枚举，这里的括号是 for 的特有用法，不是在子 shell 执行。括号内是字符串（可放多个，空格隔开）、数组（可放多个）或者哈希表（可放多个，哈希表是枚举值而不是键）。i 是用于枚举内容的变量名，变量名随意。
 # for i (aa bb cc) {
 #     echo $i
@@ -73,7 +73,11 @@ if [[ "$str" == "abc" || "$str" == "value" ]] {
 # }
 
 # select 语句是用于根据用户的选择决定分支的语句，语法和 for 语句差不多，如果不 break，会循环让用户选择。
-select i (aa bb cc) {
-    echo $i
-    break
-}
+#select i (aa bb cc) {
+#    echo $i
+#    break
+#}
+num1=123
+num2=123.456
+num3=$(($num1+$num2))
+echo "$num3"
