@@ -77,7 +77,55 @@
 #    echo $i
 #    break
 #}
-num1=123
-num2=123.456
-num3=$(($num1+$num2))
-echo "$num3"
+# num1=123
+# num2=123.456
+# num3=$(($num1+$num2))
+# # echo "$num3"
+# for i ($num1,$num2,$num3) {
+#     echo $i
+# }
+# array=($num1 $num2 $num3)
+# for i ($array) {
+#     echo $i
+# }
+# for ((i=0; i < 10; i++)) {
+#     echo $i
+# }
+
+# for i ({1..10}) {
+#     echo $i
+# }
+# repeat 5 {
+#     echo "repeat"
+# }
+# i=c
+# case $i {
+#     (a)
+#     echo 1
+#     ;;
+#     (b)
+#     echo 2
+#     #继续执行下一个
+#     ;&
+#     (c)
+#     echo 3
+#     #继续向下匹配
+#     ;|
+#     (d)
+#     echo 4
+#     ;;
+#     (*)
+#     echo other
+#     ;;
+# }
+# select i (aa bb cc) {
+#     echo $i
+#     break
+# }
+# 异常处理语句 always
+# {
+#   echo "error"
+# } always {
+#     echo "always"
+# }
+
