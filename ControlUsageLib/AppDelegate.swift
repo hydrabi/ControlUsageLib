@@ -10,7 +10,7 @@ import AvoidCrash
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
+    // worktree 功能测试：仅注释，不改变启动逻辑
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         AvoidCrash.becomeEffective()
