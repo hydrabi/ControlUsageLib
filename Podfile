@@ -8,12 +8,8 @@ target 'ControlUsageLib' do
   # Pods for ControlUsageLib
   pod 'AvoidCrash', '~> 2.5.2'
   #响应式函数框架
-  pod 'RxSwift', '~>5.1.0'
-  pod 'RxCocoa', '~>5.1.0'
-  #约束
-  pod 'SnapKit'
-  #rxswift的数据源
-  pod 'RxDataSources'
+#  #rxswift的数据源
+#  pod 'RxDataSources'
   #XML解析
   pod 'SWXMLHash', '~> 7.0.0'
   #ORM数据库
